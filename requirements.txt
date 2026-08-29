@@ -4,6 +4,7 @@ jinja2>=3.0
 # 自带抓取，不依赖邮件推送版。
 requests>=2.25
 beautifulsoup4>=4.9
+certifi          # fetch.py 直接用它来补 predoc.org 缺失的中间证书
 
 # 桌面版（desktop.py）：窗口 + 系统托盘 + 图标生成。
 # 只跑网页版的话这三个不装也行。
