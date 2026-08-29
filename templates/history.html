@@ -1,39 +1,37 @@
 {% extends "base.html" %}
-{% from "_card.html" import card %}
-{% block title %}历史列表 · Predoc Watcher{% endblock %}
+{% from "_card.html" import card with context %}
+{% block title %}{{ t('history.title') }} · Predoc Watcher{% endblock %}
 {% block body %}
 <section class="panel">
-  <h2>历史列表</h2>
+  <h2>{{ t('history.title') }}</h2>
   <form class="filters" method="get" action="/history">
-    <input type="search" name="q" value="{{ q }}" placeholder="搜领域 / 导师 / 学校学院，空格分隔多个关键词" autofocus>
+    <input type="search" name="q" value="{{ q }}" placeholder="{{ t('history.search_ph') }}" autofocus>
     <select name="source">
-      <option value="">全部来源</option>
-      {% for k, v in source_labels.items() %}
-      <option value="{{ k }}" {{ 'selected' if source==k }}>{{ v }}</option>
+      <option value="">{{ t('history.all_sources') }}</option>
+      {% for sid in source_ids %}
+      <option value="{{ sid }}" {{ 'selected' if source==sid }}>{{ source_label(sid) }}</option>
       {% endfor %}
     </select>
     <select name="status">
-      <option value="">在招 + 已下架</option>
-      <option value="open"   {{ 'selected' if status=='open' }}>只看在招</option>
-      <option value="closed" {{ 'selected' if status=='closed' }}>只看已下架</option>
+      <option value="">{{ t('history.any_status') }}</option>
+      <option value="open"   {{ 'selected' if status=='open' }}>{{ t('history.open_only') }}</option>
+      <option value="closed" {{ 'selected' if status=='closed' }}>{{ t('history.closed_only') }}</option>
     </select>
     <select name="order">
-      <option value="first_seen"  {{ 'selected' if order=='first_seen' }}>按抓取时间</option>
-      <option value="title"       {{ 'selected' if order=='title' }}>按标题</option>
-      <option value="institution" {{ 'selected' if order=='institution' }}>按机构</option>
+      <option value="first_seen"  {{ 'selected' if order=='first_seen' }}>{{ t('history.by_seen') }}</option>
+      <option value="title"       {{ 'selected' if order=='title' }}>{{ t('history.by_title') }}</option>
+      <option value="institution" {{ 'selected' if order=='institution' }}>{{ t('history.by_inst') }}</option>
     </select>
-    <button class="btn primary" type="submit">筛选</button>
-    {% if q or source or status %}<a class="btn ghost" href="/history">清空</a>{% endif %}
+    <button class="btn primary" type="submit">{{ t('history.filter') }}</button>
+    {% if q or source or status %}<a class="btn ghost" href="/history">{{ t('history.clear') }}</a>{% endif %}
   </form>
 
-  <p class="dim result-line">
-    {{ count }} 条结果
-  </p>
+  <p class="dim result-line">{{ t('history.count', n=count) }}</p>
 
   {% if jobs %}
     <div class="cards">{% for j in jobs %}{{ card(j) }}{% endfor %}</div>
   {% else %}
-    <p class="empty">没有匹配的岗位，换个词试试</p>
+    <p class="empty">{{ t('history.empty') }}</p>
   {% endif %}
 </section>
 {% endblock %}

@@ -1,19 +1,19 @@
 {% extends "base.html" %}
-{% from "_card.html" import card %}
-{% block title %}收藏夹 · Predoc Watcher{% endblock %}
+{% from "_card.html" import card with context %}
+{% block title %}{{ t('starred.title') }} · Predoc Watcher{% endblock %}
 {% block body %}
 <section class="panel">
-  <h2>收藏夹 <span class="dim">按提醒日期排序</span></h2>
+  <h2>{{ t('starred.title') }} <span class="dim">{{ t('starred.sub') }}</span></h2>
   {% if active %}
     <div class="cards">{% for j in active %}{{ card(j, show_remind=true) }}{% endfor %}</div>
   {% else %}
-    <p class="empty">还没有收藏。在首页或历史列表里点 ☆ 收藏岗位，并设一个提醒日期。</p>
+    <p class="empty">{{ t('starred.empty') }}</p>
   {% endif %}
 </section>
 
 {% if done %}
 <section class="panel muted">
-  <h2>已处理 <span class="dim">{{ done|length }} 个</span></h2>
+  <h2>{{ t('starred.done') }} <span class="dim">{{ t('starred.done_n', n=done|length) }}</span></h2>
   <div class="cards">{% for j in done %}{{ card(j, show_remind=true) }}{% endfor %}</div>
 </section>
 {% endif %}

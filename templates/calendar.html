@@ -1,19 +1,20 @@
 {% extends "base.html" %}
-{% block title %}日历 · Predoc Watcher{% endblock %}
+{% block title %}{{ t('nav.calendar') }} · Predoc Watcher{% endblock %}
 {% block body %}
 <section class="panel">
   <div class="cal-head">
-    <h2>{{ year }} 年 {{ month }} 月 <span class="dim">本月 {{ total }} 个提醒</span></h2>
+    <h2>{{ t('cal.title', year=year, month=month, month_name=month_name) }}
+        <span class="dim">{{ t('cal.count', n=total) }}</span></h2>
     <div class="cal-nav">
-      <a class="btn ghost" href="/calendar?ym={{ prev_ym }}">← 上月</a>
-      <a class="btn ghost" href="/calendar?ym={{ this_ym }}">本月</a>
-      <a class="btn ghost" href="/calendar?ym={{ next_ym }}">下月 →</a>
+      <a class="btn ghost" href="/calendar?ym={{ prev_ym }}">{{ t('cal.prev') }}</a>
+      <a class="btn ghost" href="/calendar?ym={{ this_ym }}">{{ t('cal.this') }}</a>
+      <a class="btn ghost" href="/calendar?ym={{ next_ym }}">{{ t('cal.next') }}</a>
     </div>
   </div>
 
   <div class="cal">
     <div class="cal-row cal-dow">
-      {% for d in ['一','二','三','四','五','六','日'] %}<div>周{{ d }}</div>{% endfor %}
+      {% for d in weekdays %}<div>{{ d }}</div>{% endfor %}
     </div>
     {% for week in weeks %}
     <div class="cal-row">
@@ -29,6 +30,6 @@
     </div>
     {% endfor %}
   </div>
-  <p class="dim">日历显示已收藏岗位的提醒。提醒日期在收藏时设定，可在<a href="/starred">收藏夹</a>中修改。</p>
+  <p class="dim">{{ t('cal.note') }}<a href="/starred">{{ t('nav.starred') }}</a>{{ t('cal.note_tail') }}</p>
 </section>
 {% endblock %}

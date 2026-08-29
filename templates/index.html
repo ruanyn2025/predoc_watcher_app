@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% from "_card.html" import card %}
-{% block title %}新增 · Predoc Watcher{% endblock %}
+{% from "_card.html" import card with context %}
+{% block title %}{{ t('index.title') }} · Predoc Watcher{% endblock %}
 {% block body %}
 
 {% if upcoming %}
 <section class="panel warn">
-  <h2>即将到期<span class="dim">·未来7天</span></h2>
+  <h2>{{ t('index.upcoming') }}<span class="dim">{{ t('index.upcoming_sub') }}</span></h2>
   <div class="cards">
     {% for j in upcoming %}{{ card(j, show_remind=true) }}{% endfor %}
   </div>
@@ -14,24 +14,20 @@
 
 <section class="panel">
   <div class="panel-head">
-    <h2>
-      {% if fresh_count %}未读 {{ fresh_count }} 条
-      {% else %}没有新增岗位{% endif %}
-    </h2>
+    <h2>{% if fresh_count %}{{ t('index.unread', n=fresh_count) }}{% else %}{{ t('index.none') }}{% endif %}</h2>
     {% if fresh_count %}
-      <button class="btn ghost" onclick="markRead(this)">全部标为已读</button>
+      <button class="btn ghost" onclick="markRead(this)">{{ t('index.mark_read') }}</button>
     {% endif %}
   </div>
 
   {% if fresh_count %}
     {% for g in groups %}
-      <h4 class="daysep">{{ g.day }} 新增 {{ g.jobs|length }} 条</h4>
+      <h4 class="daysep">{{ t('index.day_group', day=g.day, n=g.jobs|length) }}</h4>
       <div class="cards">{% for j in g.jobs %}{{ card(j) }}{% endfor %}</div>
     {% endfor %}
   {% else %}
     <p class="empty">
-      <span class="dim">最近一次同步 {{ last_ingest or '—' }} · 共 {{ stats.open }} 个在招 ·
-      <a href="/history">历史列表</a>。</span>
+      <span class="dim">{{ t('index.footer', date=last_ingest or '—', open=stats.open) }}<a href="/history">{{ t('nav.history') }}</a>{{ '。' if lang == 'zh' else '' }}</span>
     </p>
   {% endif %}
 </section>

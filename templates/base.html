@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="{{ 'zh-CN' if lang == 'zh' else 'en' }}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,14 +12,22 @@
   <div class="wrap">
     <a class="brand" href="/">Predoc Watcher</a>
     <nav>
-      <a href="/"         class="{{ 'on' if nav=='index' }}">新增</a>
-      <a href="/history"  class="{{ 'on' if nav=='history' }}">历史列表</a>
-      <a href="/starred"  class="{{ 'on' if nav=='starred' }}">收藏夹{% if stats.starred %} <b>{{ stats.starred }}</b>{% endif %}</a>
-      <a href="/calendar" class="{{ 'on' if nav=='calendar' }}">日历</a>
+      <a href="/"         class="{{ 'on' if nav=='index' }}">{{ t('nav.new') }}</a>
+      <a href="/history"  class="{{ 'on' if nav=='history' }}">{{ t('nav.history') }}</a>
+      <a href="/starred"  class="{{ 'on' if nav=='starred' }}">{{ t('nav.starred') }}{% if stats.starred %} <b>{{ stats.starred }}</b>{% endif %}</a>
+      <a href="/calendar" class="{{ 'on' if nav=='calendar' }}">{{ t('nav.calendar') }}</a>
     </nav>
     <div class="spacer"></div>
-    <span class="counts">在招 {{ stats.open }} · 已下架 {{ stats.closed }}</span>
-    <button class="btn ghost" onclick="refreshData(this)">刷新</button>
+    <span class="counts">{{ t('nav.counts', open=stats.open, closed=stats.closed) }}</span>
+    <button class="btn ghost" onclick="refreshData(this)">{{ t('nav.refresh') }}</button>
+    <button class="globe" onclick="switchLang()" title="{{ t('nav.lang_hint') }}"
+            aria-label="{{ t('nav.lang_hint') }}">
+      <svg viewBox="0 0 24 24" width="19" height="19" fill="none"
+           stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3z"/>
+      </svg>
+    </button>
   </div>
 </header>
 
@@ -31,25 +39,30 @@
 
 <div id="starModal" class="modal" hidden>
   <div class="modal-box">
-    <h3>加入收藏并设置提醒</h3>
+    <h3>{{ t('modal.title') }}</h3>
     <p class="job-title" id="smTitle"></p>
     <div class="src-note" id="smDeadline"></div>
     <label class="field">
-      <span>提醒日期</span>
+      <span>{{ t('modal.date') }}</span>
       <input type="date" id="smDate">
     </label>
     <div class="quick" id="smQuick"></div>
     <label class="field">
-      <span>备注（可选）</span>
-      <input type="text" id="smNote" placeholder="比如：需要两封推荐信">
+      <span>{{ t('modal.note') }}</span>
+      <input type="text" id="smNote" placeholder="{{ t('modal.note_ph') }}">
     </label>
     <div class="modal-actions">
-      <button class="btn ghost" onclick="closeStar()">取消</button>
-      <button class="btn primary" onclick="confirmStar()">确认收藏</button>
+      <button class="btn ghost" onclick="closeStar()">{{ t('modal.cancel') }}</button>
+      <button class="btn primary" onclick="confirmStar()">{{ t('modal.confirm') }}</button>
     </div>
   </div>
 </div>
 
+<script>
+  window.LANG = {{ lang | tojson }};
+  window.OTHER_LANG = {{ other_lang | tojson }};
+  window.STRINGS = {{ js_strings | safe }};   // 别叫 S —— app.js 里的取值函数占了这个名
+</script>
 <script src="/static/app.js"></script>
 </body>
 </html>

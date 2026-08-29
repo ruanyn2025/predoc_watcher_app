@@ -1,35 +1,35 @@
 {% macro card(j, show_remind=false) %}
 <article class="card {{ 'closed' if j.status=='closed' }}">
   <div class="card-head">
-    <h3><a href="{{ j.link }}" target="_blank" rel="noopener">{{ j.title or '（无标题）' }}</a></h3>
+    <h3><a href="{{ j.link }}" target="_blank" rel="noopener">{{ j.title or t('card.untitled') }}</a></h3>
     <button class="star {{ 'on' if j.starred }}"
             data-key="{{ j.key }}" data-title="{{ j.title }}"
             onclick="toggleStar(this)"
-            title="{{ '取消收藏' if j.starred else '收藏并设提醒' }}">{{ '★' if j.starred else '☆' }}</button>
+            title="{{ t('card.unstar') if j.starred else t('card.star') }}">{{ '★' if j.starred else '☆' }}</button>
   </div>
 
   <div class="badges">
-    <span class="badge src-{{ j.source }}">{{ j.source_label }}</span>
-    <span class="badge date" title="本软件首次抓取到这条岗位的日期">抓取于 {{ j.first_seen }}</span>
-    {% if j.status=='closed' %}<span class="badge gone">已下架</span>{% endif %}
+    <span class="badge src-{{ j.source }}">{{ source_label(j.source) }}</span>
+    <span class="badge date" title="{{ t('card.seen_hint') }}">{{ t('card.seen', date=j.first_seen) }}</span>
+    {% if j.status=='closed' %}<span class="badge gone">{{ t('card.closed') }}</span>{% endif %}
     {% if show_remind and j.remind_on %}
       {% set dleft = j.remind_on|days_until %}
       <span class="badge remind {{ 'urgent' if dleft is not none and dleft <= 3 }}">
-        提醒 {{ j.remind_on|fdate }}{% if dleft is not none %}（{{ '今天' if dleft==0 else ('逾期 ' ~ -dleft ~ ' 天' if dleft<0 else '剩余 ' ~ dleft ~ ' 天') }}）{% endif %}
+        {{ t('card.remind', date=fdate(j.remind_on)) }}{% if dleft is not none %}{{ t('card.today') if dleft==0 else (t('card.overdue', n=-dleft) if dleft<0 else t('card.left', n=dleft)) }}{% endif %}
       </span>
     {% endif %}
   </div>
 
   <dl class="meta">
-    {% if j.institution %}<dt>机构</dt><dd>{{ j.institution }}</dd>{% endif %}
-    {% if j.researchers %}<dt>导师</dt><dd>{{ j.researchers }}</dd>{% endif %}
-    {% if j.fields %}<dt>领域</dt><dd>{{ j.fields }}</dd>{% endif %}
-    {% if j.deadline_raw %}<dt>截止</dt><dd class="mono">{{ j.deadline_raw }}</dd>{% endif %}
-    {% if j.note %}<dt>备注</dt><dd class="mynote">{{ j.note }}</dd>{% endif %}
+    {% if j.institution %}<dt>{{ t('card.institution') }}</dt><dd>{{ j.institution }}</dd>{% endif %}
+    {% if j.researchers %}<dt>{{ t('card.researchers') }}</dt><dd>{{ j.researchers }}</dd>{% endif %}
+    {% if j.fields %}<dt>{{ t('card.fields') }}</dt><dd>{{ j.fields }}</dd>{% endif %}
+    {% if j.deadline_raw %}<dt>{{ t('card.deadline') }}</dt><dd class="mono">{{ j.deadline_raw }}</dd>{% endif %}
+    {% if j.note %}<dt>{{ t('card.note') }}</dt><dd class="mynote">{{ j.note }}</dd>{% endif %}
   </dl>
 
   {% if j.tags %}
-  <div class="tags">{% for t in j.tags %}<span class="tag">{{ t }}</span>{% endfor %}</div>
+  <div class="tags">{% for tg in j.tags %}<span class="tag">{{ tg }}</span>{% endfor %}</div>
   {% endif %}
 </article>
 {% endmacro %}

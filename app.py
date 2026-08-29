@@ -23,6 +23,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 import db
 import deadlines
+import i18n
 import ingest
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -34,15 +35,6 @@ env = Environment(
 )
 
 
-def _fmt_date(value, fmt="%m月%d日"):
-    if not value:
-        return ""
-    try:
-        return datetime.strptime(str(value)[:10], "%Y-%m-%d").strftime(fmt)
-    except ValueError:
-        return str(value)
-
-
 def _days_until(value):
     try:
         d = datetime.strptime(str(value)[:10], "%Y-%m-%d").date()
@@ -51,19 +43,30 @@ def _days_until(value):
     return (d - date.today()).days
 
 
-env.filters["fdate"] = _fmt_date
 env.filters["days_until"] = _days_until
 
 
 def render(name, **ctx):
     conn = ctx.pop("conn", None)
+    lang = ctx.get("lang") or i18n.DEFAULT_LANG
     if conn is not None:
         ctx.setdefault("stats", db.stats(conn))
     ctx.setdefault("today", date.today())
+    ctx["lang"] = lang
+    ctx["other_lang"] = "en" if lang == "zh" else "zh"
+    ctx["t"] = lambda key, **kw: i18n.t(key, lang, **kw)
+    ctx["fdate"] = lambda v: i18n.fdate(v, lang)
+    ctx["source_label"] = lambda sid: i18n.source_label(sid, lang)
+    ctx["js_strings"] = json.dumps(i18n.js_strings(lang), ensure_ascii=False)
     return env.get_template(name).render(**ctx).encode("utf-8")
 
 
+def current_lang(conn):
+    return i18n.normalise(db.get_meta(conn, "lang", i18n.DEFAULT_LANG))
+
+
 def page_index(conn, query):
+    lang = current_lang(conn)
     fresh = db.unread_jobs(conn)
     groups = []
     for job in fresh:
@@ -78,10 +81,11 @@ def page_index(conn, query):
                   upcoming=upcoming,
                   last_ingest=db.get_meta(conn, "last_fetch_at"),
                   initialized_on=db.get_meta(conn, "initialized_on"),
-                  nav="index")
+                  nav="index", lang=lang)
 
 
 def page_history(conn, query):
+    lang = current_lang(conn)
     q = (query.get("q", [""])[0] or "").strip()
     source = query.get("source", [""])[0]
     status = query.get("status", [""])[0]
@@ -89,17 +93,19 @@ def page_history(conn, query):
     jobs = db.search_jobs(conn, q=q, source=source, status=status, order=order, limit=1000)
     return render("history.html", conn=conn, jobs=jobs, q=q, source=source,
                   status=status, order=order, count=len(jobs),
-                  source_labels=db.SOURCE_LABELS, nav="history")
+                  source_ids=list(db.SOURCE_LABELS), nav="history", lang=lang)
 
 
 def page_starred(conn, query):
+    lang = current_lang(conn)
     jobs = db.starred_jobs(conn)
     return render("starred.html", conn=conn, jobs=jobs,
                   active=[j for j in jobs if not j["done"]],
-                  done=[j for j in jobs if j["done"]], nav="starred")
+                  done=[j for j in jobs if j["done"]], nav="starred", lang=lang)
 
 
 def page_calendar(conn, query):
+    lang = current_lang(conn)
     ym = query.get("ym", [""])[0] or date.today().strftime("%Y-%m")
     try:
         year, month = (int(x) for x in ym.split("-"))
@@ -130,7 +136,8 @@ def page_calendar(conn, query):
     return render("calendar.html", conn=conn, weeks=weeks, year=year, month=month,
                   prev_ym=prev_m.strftime("%Y-%m"), next_ym=nxt.strftime("%Y-%m"),
                   this_ym=date.today().strftime("%Y-%m"),
-                  total=sum(len(v) for v in by_day.values()), nav="calendar")
+                  total=sum(len(v) for v in by_day.values()), nav="calendar", lang=lang,
+                  weekdays=i18n.weekdays(lang), month_name=i18n.month_name(month, lang))
 
 
 def api_suggest(conn, payload):
@@ -166,6 +173,13 @@ def api_done(conn, payload):
     return {"ok": True}
 
 
+def api_lang(conn, payload):
+    """切换界面语言。存进 meta，所以下次打开还是这门语言。"""
+    db.set_meta(conn, "lang", i18n.normalise(payload.get("lang")))
+    conn.commit()
+    return {"ok": True}
+
+
 def api_mark_read(conn, payload):
     return {"ok": True, "cleared": db.mark_all_read(conn)}
 
@@ -180,7 +194,7 @@ def api_refresh(conn, payload):
 
 PAGES = {"/": page_index, "/history": page_history,
          "/starred": page_starred, "/calendar": page_calendar}
-APIS = {"/api/suggest": api_suggest, "/api/star": api_star, "/api/unstar": api_unstar,
+APIS = {"/api/lang": api_lang, "/api/suggest": api_suggest, "/api/star": api_star, "/api/unstar": api_unstar,
         "/api/done": api_done, "/api/mark-read": api_mark_read, "/api/refresh": api_refresh}
 
 

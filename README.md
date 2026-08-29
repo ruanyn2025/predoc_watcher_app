@@ -42,6 +42,14 @@ D:\miniforge3\envs\dc1\python.exe desktop.py
 D:\miniforge3\envs\dc1\python.exe app.py
 ```
 
+## 中英双语
+
+点右上角的**地球图标**在中文 / English 之间切换。选择存在数据库里，下次打开还是上次那门语言。
+
+所有界面文案集中在 `i18n.py` 的 `S` 字典里（模板和前端都从这里取），加一门语言只需在
+每条后面再补一列。英文串里的 `|` 用来分隔单复数（`{n} result|{n} results`），
+中文侧不需要这个。
+
 ## 四个页面
 
 **首页** —— 自上次「标为已读」以来的新增岗位，按抓取日期分组；顶部是未来 7 天内
@@ -119,6 +127,7 @@ python ingest.py --from-state
 ```
 desktop.py       桌面外壳：窗口 + 系统托盘（✕ 挂起、右键退出、后台定时抓取）
 app.py           HTTP 服务与路由（标准库 http.server，没有 Flask）
+i18n.py          中英文案表（界面上所有能看到的字都在这）
 fetch.py         抓取与解析三个网站（自带，不依赖邮件版）
 db.py            SQLite 表结构与查询
 ingest.py        抓取结果 -> jobs.db

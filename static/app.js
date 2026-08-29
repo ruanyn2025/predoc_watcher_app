@@ -1,5 +1,18 @@
 'use strict';
 
+/* 界面文案由服务端按当前语言注入到 window.S（见 i18n.py 的 js_strings）。
+   模板里的静态文字已经翻好了，这里只管动态生成的那部分。 */
+function S(key, vars) {
+  let text = (window.STRINGS || {})[key] || key;
+  if (vars) for (const k in vars) text = text.replaceAll('{' + k + '}', vars[k]);
+  return text;
+}
+
+async function switchLang() {
+  await post('/api/lang', { lang: window.OTHER_LANG });
+  location.reload();
+}
+
 function toast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -30,17 +43,17 @@ async function toggleStar(btn) {
   const key = btn.dataset.key;
   if (btn.classList.contains('on')) {
     const r = await post('/api/unstar', { key });
-    if (r.ok) { btn.classList.remove('on'); btn.textContent = '☆'; toast('已取消收藏'); }
+    if (r.ok) { btn.classList.remove('on'); btn.textContent = '☆'; toast(S('toast.unstarred')); }
     return;
   }
   pendingKey = key;
   const s = await post('/api/suggest', { key });
-  if (!s.ok) { toast(s.error || '出错了'); return; }
+  if (!s.ok) { toast(s.error || S('toast.error')); return; }
 
   document.getElementById('smTitle').textContent = btn.dataset.title || '';
   // 抽出日期就显示日期；抽不出但原文有话（Rolling 之类）就照搬原文；两者都无才是暂无
   document.getElementById('smDeadline').textContent =
-    '招聘截止日期：' + (s.parsed || s.deadline_raw || '暂无');
+    S('modal.deadline') + (s.parsed || s.deadline_raw || S('modal.none'));
   document.getElementById('smDate').value = s.remind_on;
   document.getElementById('smNote').value = '';
   document.getElementById('smDate').dataset.basis = s.basis;
@@ -57,15 +70,15 @@ async function toggleStar(btn) {
   };
   if (s.parsed) {
     const p = new Date(s.parsed + 'T00:00:00');
-    [[3, '提前 3 天'], [7, '提前 7 天']].forEach(([n, lab]) => {
+    [3, 7].forEach((n) => {
       const d = new Date(p); d.setDate(d.getDate() - n);
-      if (d > new Date()) add(lab, ymd(d));
+      if (d > new Date()) add(S('modal.before_n', { n }), ymd(d));
     });
-    add('就在截止日', s.parsed);
+    add(S('modal.on_deadline'), s.parsed);
   }
-  [[3, '3 天后'], [7, '7 天后'], [14, '14 天后'], [30, '30 天后']].forEach(([n, lab]) => {
+  [3, 7, 14, 30].forEach((n) => {
     const d = new Date(); d.setDate(d.getDate() + n);
-    add(lab, ymd(d));
+    add(S('modal.in_n', { n }), ymd(d));
   });
 
   document.getElementById('starModal').hidden = false;
@@ -86,12 +99,13 @@ async function confirmStar() {
     basis: dateEl.dataset.basis || 'manual',
     note: document.getElementById('smNote').value,
   });
-  if (!r.ok) { toast(r.error || '保存失败'); return; }
+  if (!r.ok) { toast(r.error || S('toast.save_fail')); return; }
 
   const btn = document.querySelector('.star[data-key="' + CSS.escape(pendingKey) + '"]');
   if (btn) { btn.classList.add('on'); btn.textContent = '★'; }
   closeStar();
-  toast(dateEl.value ? '已收藏·将于' + dateEl.value + '提醒' : '已收藏·未设提醒');
+  toast(dateEl.value ? S('toast.starred', { date: dateEl.value })
+                     : S('toast.starred_no_date'));
 }
 
 /* ---------------- 其他动作 ---------------- */
@@ -99,21 +113,21 @@ async function confirmStar() {
 async function markRead(btn) {
   btn.disabled = true;
   const r = await post('/api/mark-read', {});
-  if (r.ok) location.reload(); else { toast('出错了'); btn.disabled = false; }
+  if (r.ok) location.reload(); else { toast(S('toast.error')); btn.disabled = false; }
 }
 
 async function refreshData(btn) {
   btn.disabled = true;
   const old = btn.textContent;
-  btn.textContent = '检查中…';
+  btn.textContent = S('toast.checking');
   const r = await post('/api/refresh', {});
   btn.disabled = false;
   btn.textContent = old;
-  if (!r.ok) { toast('抓取失败：' + r.error); return; }
+  if (!r.ok) { toast(S('toast.fetch_fail') + r.error); return; }
   const d = r.result;
   const failed = Object.keys(d.failures || {}).length;
-  toast('新增 ' + d.added + ' · 下架 ' + d.closed + ' · 在招 ' + d.total
-        + (failed ? '（' + failed + ' 个来源抓取失败）' : ''));
+  toast(S('toast.result', { added: d.added, closed: d.closed, total: d.total })
+        + (failed ? S('toast.some_failed', { n: failed }) : ''));
   if (d.added || d.closed) setTimeout(() => location.reload(), 1200);
 }
 
