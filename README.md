@@ -1,4 +1,4 @@
-# 岗位浏览器（webapp）
+# Predoc Watcher
 
 盯着三个 pre-doc / RA 招聘页，把岗位变成一个能翻、能搜、能收藏、能提醒的小软件。
 
@@ -16,8 +16,8 @@
 "Add Python to PATH"）。
 
 ```bash
-git clone https://github.com/ruanyn2025/predoc-position-watcher.git
-cd predoc-position-watcher/webapp
+git clone https://github.com/ruanyn2025/predoc_watcher_app.git
+cd predoc_watcher_app
 pip install -r requirements.txt
 ```
 

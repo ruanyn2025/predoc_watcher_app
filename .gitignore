@@ -1,0 +1,21 @@
+# 你的数据：岗位快照、收藏、提醒。绝不提交。
+jobs.db
+jobs.db-journal
+jobs.db-wal
+jobs.db-shm
+
+# 本机 Python 解释器路径（各人不同）
+python_path.txt
+
+# 运行时由 certifi + extra_ca/*.pem 自动合成
+.ca_bundle.pem
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# 调试残留
+*.log
+_shot.png
