@@ -49,6 +49,7 @@ class Shell:
         self.httpd = None
         self.quitting = False
         self.wake = threading.Event()      # 用来叫醒后台抓取线程
+        self.announce_next = False         # 只有主动点「立即检查更新」才回报"没有新岗位"
 
     # ---------------------------------------------------------- HTTP 服务
 
@@ -97,12 +98,18 @@ class Shell:
         image = Image.open(ICON_PNG)
         menu = pystray.Menu(
             pystray.MenuItem("打开 %s" % APP_NAME, self.show_window, default=True),
-            pystray.MenuItem("立即检查更新", lambda *_: self.wake.set()),
+            pystray.MenuItem("立即检查更新", self.check_now),
             pystray.Menu.SEPARATOR,
             pystray.MenuItem("退出", self.quit),
         )
         self.tray = pystray.Icon("predoc_watcher", image, APP_NAME, menu)
         threading.Thread(target=self.tray.run, daemon=True).start()
+
+    def check_now(self, *_):
+        """托盘菜单里主动触发 —— 这种情况下没有新岗位也要回个话，
+        否则你不知道它到底查没查。自动跑的那些则保持静默。"""
+        self.announce_next = True
+        self.wake.set()
 
     def quit(self, *_):
         self.quitting = True
@@ -120,10 +127,17 @@ class Shell:
     # ---------------------------------------------------------- 后台抓取
 
     def fetch_loop(self):
-        """隐藏时抓一次，之后每隔 interval 再抓。有新岗位就弹托盘通知。"""
+        """隐藏时抓一次，之后每隔 interval 再抓。
+
+        **只有真的发现新岗位才弹通知**，其余一律静默 —— 后台每隔几小时跑一次，
+        每次都汇报"没有新岗位"是纯粹的打扰。唯一的例外是你从托盘主动点了
+        「立即检查更新」，那种情况下不回话反而让人不确定它有没有执行。
+        """
         while not self.quitting:
-            triggered = self.wake.wait(timeout=self.interval)
+            self.wake.wait(timeout=self.interval)
             self.wake.clear()
+            announce = self.announce_next
+            self.announce_next = False
             if self.quitting:
                 return
             conn = db.connect()
@@ -131,13 +145,13 @@ class Shell:
                 r = ingest.refresh(conn)
             except Exception as exc:                        # noqa: BLE001
                 conn.close()
-                if triggered:                               # 手动触发的才报错，定时的静默
+                if announce:
                     self.notify("检查失败：%s" % exc)
                 continue
             conn.close()
             if r["added"]:
                 self.notify("发现 %d 个新岗位，点开看看" % r["added"])
-            elif triggered:
+            elif announce:
                 failed = len(r["failures"])
                 self.notify("没有新岗位" + ("（%d 个来源抓取失败）" % failed if failed else ""))
 
