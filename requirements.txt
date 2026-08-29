@@ -1,5 +1,12 @@
-# 本软件自带抓取，不依赖邮件推送版。
-# 其余用标准库（http.server / sqlite3 / json / datetime），刻意不用 Flask。
+# 网页界面本身（app.py）只需要 jinja2，其余用标准库。
 jinja2>=3.0
+
+# 自带抓取，不依赖邮件推送版。
 requests>=2.25
 beautifulsoup4>=4.9
+
+# 桌面版（desktop.py）：窗口 + 系统托盘 + 图标生成。
+# 只跑网页版的话这三个不装也行。
+pywebview>=4.0
+pystray>=0.19
+pillow>=9.0
