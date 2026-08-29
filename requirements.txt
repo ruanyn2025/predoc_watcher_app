@@ -1,0 +1,4 @@
+# 只有一个第三方依赖：模板引擎。
+# 其余全部是标准库（http.server / sqlite3 / json / datetime），
+# 刻意不用 Flask，这样不必往 conda 环境里装新包。
+jinja2>=3.0

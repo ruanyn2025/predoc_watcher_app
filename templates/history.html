@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% from "_card.html" import card %}
+{% block title %}历史列表 · 岗位浏览器{% endblock %}
+{% block body %}
+<section class="panel">
+  <h2>历史列表</h2>
+  <form class="filters" method="get" action="/history">
+    <input type="search" name="q" value="{{ q }}" placeholder="搜领域 / 导师 / 学校学院，空格分隔多个关键词" autofocus>
+    <select name="source">
+      <option value="">全部来源</option>
+      {% for k, v in source_labels.items() %}
+      <option value="{{ k }}" {{ 'selected' if source==k }}>{{ v }}</option>
+      {% endfor %}
+    </select>
+    <select name="status">
+      <option value="">在招 + 已下架</option>
+      <option value="open"   {{ 'selected' if status=='open' }}>只看在招</option>
+      <option value="closed" {{ 'selected' if status=='closed' }}>只看已下架</option>
+    </select>
+    <select name="order">
+      <option value="first_seen"  {{ 'selected' if order=='first_seen' }}>按抓取时间</option>
+      <option value="title"       {{ 'selected' if order=='title' }}>按标题</option>
+      <option value="institution" {{ 'selected' if order=='institution' }}>按机构</option>
+    </select>
+    <button class="btn primary" type="submit">筛选</button>
+    {% if q or source or status %}<a class="btn ghost" href="/history">清空</a>{% endif %}
+  </form>
+
+  <p class="dim result-line">
+    命中 {{ count }} 条{% if q %}，关键词「{{ q }}」{% endif %}
+  </p>
+
+  {% if jobs %}
+    <div class="cards">{% for j in jobs %}{{ card(j) }}{% endfor %}</div>
+  {% else %}
+    <p class="empty">没有匹配的岗位。试试更宽的关键词，比如只搜 <code>labor</code> 或 <code>Harvard</code>。</p>
+  {% endif %}
+</section>
+{% endblock %}

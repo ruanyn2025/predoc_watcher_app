@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% from "_card.html" import card %}
+{% block title %}首页 · 岗位浏览器{% endblock %}
+{% block body %}
+
+{% if upcoming %}
+<section class="panel warn">
+  <h2>即将到期的收藏 <span class="dim">未来 14 天内</span></h2>
+  <div class="cards">
+    {% for j in upcoming %}{{ card(j, show_remind=true) }}{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section class="panel">
+  <div class="panel-head">
+    <h2>
+      {% if fresh_count %}自上次查看以来新增 {{ fresh_count }} 个岗位
+      {% else %}没有新增岗位{% endif %}
+    </h2>
+    {% if fresh_count %}
+      <button class="btn ghost" onclick="markRead(this)">全部标为已读</button>
+    {% endif %}
+  </div>
+
+  {% if fresh_count %}
+    {% for g in groups %}
+      <h4 class="daysep">{{ g.day }} 抓取到 {{ g.jobs|length }} 条</h4>
+      <div class="cards">{% for j in g.jobs %}{{ card(j) }}{% endfor %}</div>
+    {% endfor %}
+  {% else %}
+    <p class="empty">
+      未读都清完了，邮件版此后还没抓到新岗位。<br>
+      <span class="dim">最近一次同步 {{ last_ingest or '—' }} · 建库于 {{ initialized_on or '—' }} ·
+      共 {{ stats.open }} 个在招，可以去<a href="/history">历史列表</a>翻。</span>
+    </p>
+  {% endif %}
+</section>
+{% endblock %}
