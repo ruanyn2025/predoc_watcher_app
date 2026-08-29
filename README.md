@@ -2,8 +2,30 @@
 
 盯着三个 pre-doc / RA 招聘页，把岗位变成一个能翻、能搜、能收藏、能提醒的小软件。
 
-**自带抓取，不依赖任何其他东西。** 同仓库里的 `../mailer/`（每日邮件推送）是过渡期
-的方案，可以随时停用或整个删掉，本软件照常运行 —— 两边互不 import，各抓各的。
+自带抓取、自带数据库，装完就能用 —— 不需要 API key、不需要邮箱、不需要任何账号。
+
+| 来源 | 页面 |
+|---|---|
+| predoc.org | <https://www.predoc.org/opportunities> |
+| NBER（本部） | <https://www.nber.org/career-resources/research-assistant-positions-nber> |
+| NBER（非本部） | <https://www.nber.org/career-resources/research-assistant-positions-not-nber> |
+
+## 安装
+
+需要 **Python 3.9+**（[下载](https://www.python.org/downloads/)，Windows 安装时记得勾
+"Add Python to PATH"）。
+
+```bash
+git clone https://github.com/ruanyn2025/predoc-position-watcher.git
+cd predoc-position-watcher/webapp
+pip install -r requirements.txt
+```
+
+然后双击 `启动.bat`，或者 `python desktop.py`。第一次启动会去抓一遍三个网站、
+建立本地数据库，要几秒钟。
+
+> Windows 以外：窗口和托盘依赖 pywebview / pystray，主要在 Windows 上验过。
+> Mac / Linux 可以跑纯网页版（见下方「只要网页版」），那部分是跨平台的。
 
 ## 启动
 
@@ -85,7 +107,7 @@ python desktop.py
 <http://127.0.0.1:8765/>，也不需要装 pywebview / pystray：
 
 ```
-D:\miniforge3\envs\dc1\python.exe app.py
+python app.py
 ```
 
 ## 多语言
@@ -172,23 +194,13 @@ D:\miniforge3\envs\dc1\python.exe app.py
 或 `Available Positions` 标题）并达到最少条数，任一不满足就判为**抓取失败**；
 失败来源的岗位**原样保留、绝不标下架**，且各来源独立失败，一个挂了不影响另外两个。
 
-### 从邮件版迁移
-
-如果你之前跑过邮件版，它的 `state.json` 可以当初始快照导入一次：
-
-```
-python ingest.py --from-state
-```
-
-主键算法与邮件版逐字一致，所以导入后再自己抓，存量岗位不会被误报成新增。
-
 ## 文件
 
 ```
 desktop.py       桌面外壳：窗口 + 系统托盘（✕ 挂起、右键退出、后台定时抓取）
 app.py           HTTP 服务与路由（标准库 http.server，没有 Flask）
 i18n.py          中英文案表（界面上所有能看到的字都在这）
-fetch.py         抓取与解析三个网站（自带，不依赖邮件版）
+fetch.py         抓取与解析三个网站
 db.py            SQLite 表结构与查询
 ingest.py        抓取结果 -> jobs.db
 deadlines.py     截止日期解析（脏数据全在这里对付）
