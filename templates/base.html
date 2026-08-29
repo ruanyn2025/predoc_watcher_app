@@ -20,14 +20,23 @@
     <div class="spacer"></div>
     <span class="counts">{{ t('nav.counts', open=stats.open, closed=stats.closed) }}</span>
     <button class="btn ghost" onclick="refreshData(this)">{{ t('nav.refresh') }}</button>
-    <button class="globe" onclick="switchLang()" title="{{ t('nav.lang_hint') }}"
-            aria-label="{{ t('nav.lang_hint') }}">
-      <svg viewBox="0 0 24 24" width="19" height="19" fill="none"
-           stroke="currentColor" stroke-width="1.7" aria-hidden="true">
-        <circle cx="12" cy="12" r="9"/>
-        <path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3z"/>
-      </svg>
-    </button>
+    <div class="langbox">
+      <button class="globe" onclick="toggleLangMenu(event)" title="{{ t('nav.language') }}"
+              aria-label="{{ t('nav.language') }}" aria-haspopup="true" aria-expanded="false">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none"
+             stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M3 12h18M12 3c2.5 2.6 3.8 5.7 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.7-3.8-9S9.5 5.6 12 3z"/>
+        </svg>
+      </button>
+      <div class="langmenu" id="langMenu" hidden>
+        {% for code, name, is_current in lang_options %}
+        <button class="langitem {{ 'on' if is_current }}" onclick="pickLang('{{ code }}')">
+          <span class="tick">{{ '✓' if is_current else '' }}</span>{{ name }}
+        </button>
+        {% endfor %}
+      </div>
+    </div>
   </div>
 </header>
 
@@ -60,7 +69,6 @@
 
 <script>
   window.LANG = {{ lang | tojson }};
-  window.OTHER_LANG = {{ other_lang | tojson }};
   window.STRINGS = {{ js_strings | safe }};   // 别叫 S —— app.js 里的取值函数占了这个名
 </script>
 <script src="/static/app.js"></script>

@@ -53,11 +53,11 @@ def render(name, **ctx):
         ctx.setdefault("stats", db.stats(conn))
     ctx.setdefault("today", date.today())
     ctx["lang"] = lang
-    ctx["other_lang"] = "en" if lang == "zh" else "zh"
     ctx["t"] = lambda key, **kw: i18n.t(key, lang, **kw)
     ctx["fdate"] = lambda v: i18n.fdate(v, lang)
     ctx["source_label"] = lambda sid: i18n.source_label(sid, lang)
     ctx["js_strings"] = json.dumps(i18n.js_strings(lang), ensure_ascii=False)
+    ctx["lang_options"] = i18n.lang_options(lang)
     return env.get_template(name).render(**ctx).encode("utf-8")
 
 

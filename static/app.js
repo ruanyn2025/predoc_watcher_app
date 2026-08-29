@@ -8,10 +8,28 @@ function S(key, vars) {
   return text;
 }
 
-async function switchLang() {
-  await post('/api/lang', { lang: window.OTHER_LANG });
+function toggleLangMenu(e) {
+  e.stopPropagation();                       // 否则会立刻被下面那个"点别处就关"接住
+  const m = document.getElementById('langMenu');
+  m.hidden = !m.hidden;
+  e.currentTarget.setAttribute('aria-expanded', String(!m.hidden));
+}
+
+function closeLangMenu() {
+  const m = document.getElementById('langMenu');
+  if (m && !m.hidden) {
+    m.hidden = true;
+    document.querySelector('.globe').setAttribute('aria-expanded', 'false');
+  }
+}
+
+async function pickLang(code) {
+  if (code === window.LANG) { closeLangMenu(); return; }
+  await post('/api/lang', { lang: code });
   location.reload();
 }
+
+document.addEventListener('click', closeLangMenu);
 
 function toast(msg) {
   const t = document.getElementById('toast');
