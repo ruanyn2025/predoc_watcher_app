@@ -1,11 +1,16 @@
+/* 配色取自应用图标：橙 + 白 + 黑。底面是淡橙而非纯白。
+   --accent 是能安全承载文字的深橙（白底上约 5:1 对比度）；
+   --bright 是图标那支亮橙，只用来填色，其上的文字一律用近黑的 --on-bright，
+   亮橙配白字对比度不够，配黑字反而有 10:1，也更像图标本身。 */
 :root{
-  --bg:#f6f7f9; --card:#fff; --ink:#1c2128; --dim:#6a737d; --line:#e2e5ea;
-  --accent:#2f6fd0; --accent-soft:#eaf1fc; --warn:#b8500f; --warn-soft:#fdf2e7;
-  --star:#e2a33c; --gone:#98a0aa; --radius:10px;
+  --bg:#fbf2e6; --card:#fffefb; --ink:#1f1c18; --dim:#8a7f72; --line:#eddfcc;
+  --accent:#b8620a; --bright:#f59e1a; --on-bright:#1f1c18; --accent-soft:#fdf0dc;
+  --gone:#a89e94; --radius:10px;
 }
 @media (prefers-color-scheme:dark){
-  :root{ --bg:#14171b; --card:#1c2025; --ink:#e6e9ee; --dim:#9099a4; --line:#2b3038;
-    --accent:#6ea8f5; --accent-soft:#1e2836; --warn:#e8a366; --warn-soft:#2b2118; --gone:#6b7480; }
+  :root{ --bg:#15130f; --card:#1e1b17; --ink:#f2ece3; --dim:#9a8f80; --line:#2d2823;
+    --accent:#f0a640; --bright:#f59e1a; --on-bright:#1f1c18; --accent-soft:#2a2016;
+    --gone:#6f665c; }
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);
@@ -22,7 +27,7 @@ a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
 .topbar nav{display:flex;gap:16px}
 .topbar nav a{color:var(--dim);padding:4px 0;border-bottom:2px solid transparent;white-space:nowrap}
 .topbar nav a.on{color:var(--ink);border-bottom-color:var(--accent);font-weight:600}
-.topbar nav a b{background:var(--accent);color:#fff;border-radius:9px;padding:0 6px;font-size:11px}
+.topbar nav a b{background:var(--bright);color:var(--on-bright);font-weight:700;border-radius:9px;padding:0 6px;font-size:11px}
 .spacer{flex:1}
 .counts{color:var(--dim);font-size:13px;white-space:nowrap}
 
@@ -37,7 +42,7 @@ a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
 /* 面板 */
 .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
   padding:20px 22px;margin:20px 0}
-.panel.warn{border-color:var(--warn);background:var(--warn-soft)}
+.panel.warn{border-color:var(--accent);background:var(--accent-soft)}
 .panel.muted{opacity:.72}
 .panel h2{font-size:17px;margin:0 0 14px}
 .panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
@@ -54,20 +59,20 @@ a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
 .card-head{display:flex;align-items:flex-start;gap:10px}
 .card-head h3{margin:0;font-size:15.5px;font-weight:600;flex:1;line-height:1.45}
 .star{background:none;border:0;font-size:21px;line-height:1;cursor:pointer;color:var(--dim);padding:0 2px}
-.star.on{color:var(--star)}
+.star.on{color:var(--bright)}
 .star:hover{transform:scale(1.15)}
 
 .badges{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
 .badge{font-size:11.5px;padding:2px 8px;border-radius:20px;background:var(--accent-soft);color:var(--accent)}
 .badge.date{background:transparent;color:var(--dim);border:1px solid var(--line)}
 .badge.gone{background:transparent;color:var(--gone);border:1px solid var(--gone)}
-.badge.remind{background:var(--warn-soft);color:var(--warn);border:1px solid var(--warn)}
-.badge.remind.urgent{background:var(--warn);color:#fff}
+.badge.remind{background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent)}
+.badge.remind.urgent{background:var(--bright);color:var(--on-bright);font-weight:600}
 
 dl.meta{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;margin:8px 0 0;font-size:13.5px}
 dl.meta dt{color:var(--dim);white-space:nowrap}
 dl.meta dd{margin:0}
-dd.mynote{color:var(--warn)}
+dd.mynote{color:var(--accent)}
 .tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
 .tag{font-size:11px;color:var(--dim);border:1px solid var(--line);border-radius:4px;padding:1px 6px}
 
@@ -79,7 +84,7 @@ input,select{font:inherit;padding:7px 10px;border:1px solid var(--line);border-r
 input:focus,select:focus{outline:2px solid var(--accent);outline-offset:-1px}
 .btn{font:inherit;padding:7px 14px;border-radius:7px;border:1px solid var(--line);
   background:var(--card);color:var(--ink);cursor:pointer;white-space:nowrap}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary{background:var(--bright);border-color:var(--bright);color:var(--on-bright);font-weight:600}
 .btn.ghost:hover{border-color:var(--accent);color:var(--accent)}
 .btn:disabled{opacity:.5;cursor:default}
 
@@ -97,8 +102,8 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:-1px}
 .cal-cell.today{background:var(--accent-soft)}
 .cal-cell.today .dnum{color:var(--accent);font-weight:700}
 .dnum{font-size:12px;color:var(--dim);margin-bottom:3px}
-.ev{display:block;font-size:11px;line-height:1.35;background:var(--warn-soft);color:var(--warn);
-  border-left:3px solid var(--warn);border-radius:3px;padding:2px 4px;margin-bottom:3px;
+.ev{display:block;font-size:11px;line-height:1.35;background:var(--accent-soft);color:var(--accent);
+  border-left:3px solid var(--accent);border-radius:3px;padding:2px 4px;margin-bottom:3px;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ev.done{background:transparent;color:var(--gone);border-left-color:var(--gone);text-decoration:line-through}
 
