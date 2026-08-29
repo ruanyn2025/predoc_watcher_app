@@ -35,11 +35,16 @@ ROWS = GH * 2 + GAP             # 两行 = 11 格
 
 BLACK = (24, 26, 30, 255)
 WHITE = (255, 255, 255, 255)
-ORANGE = (245, 158, 26, 255)
+ORANGE = (234, 122, 16, 255)
 CLEAR = (0, 0, 0, 0)
 
 # 字块占画布的比例。0.76 让字尽量撑满，四周只留一点点边 —— 小尺寸下更好认。
 FILL = 0.76
+
+# 往右的视觉补正（单位：格）。几何居中时看着偏左，因为左右两边的墨量差很多：
+# 最左列是 p/d 的满高竖干（10 格墨），最右列只有 e/c 的上下两横（4 格墨）。
+# 实测墨迹重心落在第 4.83 列而不是 5.00 列，偏左 0.17 格，这里正好抵消掉。
+NUDGE_X = 0.2
 
 ICO_SIZES = [16, 20, 24, 32, 40, 48, 64, 96, 128, 256]
 
@@ -66,7 +71,7 @@ def render(size):
                 px[x, size - 1 - y] = CLEAR
                 px[size - 1 - x, size - 1 - y] = CLEAR
 
-    ox0 = (size - COLS * unit) // 2
+    ox0 = round((size - COLS * unit) / 2 + NUDGE_X * unit)
     oy0 = (size - ROWS * unit) // 2
     for row, (word, color) in enumerate((("pre", WHITE), ("doc", ORANGE))):
         for i, ch in enumerate(word):

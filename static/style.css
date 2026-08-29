@@ -4,12 +4,12 @@
    亮橙配白字对比度不够，配黑字反而有 10:1，也更像图标本身。 */
 :root{
   --bg:#fbf2e6; --card:#fffefb; --ink:#1f1c18; --dim:#8a7f72; --line:#eddfcc;
-  --accent:#b8620a; --bright:#f59e1a; --on-bright:#1f1c18; --accent-soft:#fdf0dc;
+  --accent:#b05c07; --bright:#ea7a10; --on-bright:#1f1c18; --accent-soft:#fdf0dc;
   --gone:#a89e94; --radius:10px;
 }
 @media (prefers-color-scheme:dark){
   :root{ --bg:#15130f; --card:#1e1b17; --ink:#f2ece3; --dim:#9a8f80; --line:#2d2823;
-    --accent:#f0a640; --bright:#f59e1a; --on-bright:#1f1c18; --accent-soft:#2a2016;
+    --accent:#ef9a3a; --bright:#ea7a10; --on-bright:#1f1c18; --accent-soft:#2a2016;
     --gone:#6f665c; }
 }
 *{box-sizing:border-box}
