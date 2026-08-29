@@ -1,4 +1,5 @@
-# 只有一个第三方依赖：模板引擎。
-# 其余全部是标准库（http.server / sqlite3 / json / datetime），
-# 刻意不用 Flask，这样不必往 conda 环境里装新包。
+# 本软件自带抓取，不依赖邮件推送版。
+# 其余用标准库（http.server / sqlite3 / json / datetime），刻意不用 Flask。
 jinja2>=3.0
+requests>=2.25
+beautifulsoup4>=4.9

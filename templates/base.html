@@ -3,22 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{% block title %}岗位浏览器{% endblock %}</title>
+<title>{% block title %}Predoc Watcher{% endblock %}</title>
 <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
 <header class="topbar">
   <div class="wrap">
-    <a class="brand" href="/">RA 岗位浏览器</a>
+    <a class="brand" href="/">Predoc Watcher</a>
     <nav>
-      <a href="/"         class="{{ 'on' if nav=='index' }}">首页</a>
+      <a href="/"         class="{{ 'on' if nav=='index' }}">新增</a>
       <a href="/history"  class="{{ 'on' if nav=='history' }}">历史列表</a>
       <a href="/starred"  class="{{ 'on' if nav=='starred' }}">收藏夹{% if stats.starred %} <b>{{ stats.starred }}</b>{% endif %}</a>
       <a href="/calendar" class="{{ 'on' if nav=='calendar' }}">日历</a>
     </nav>
     <div class="spacer"></div>
     <span class="counts">在招 {{ stats.open }} · 已下架 {{ stats.closed }}</span>
-    <button class="btn ghost" onclick="refreshData(this)">同步数据</button>
+    <button class="btn ghost" onclick="refreshData(this)">刷新</button>
   </div>
 </header>
 
@@ -32,10 +32,7 @@
   <div class="modal-box">
     <h3>加入收藏并设置提醒</h3>
     <p class="job-title" id="smTitle"></p>
-    <div class="src-note">
-      <div><span class="lbl">原始截止信息</span><span id="smRaw" class="mono"></span></div>
-      <div><span class="lbl">程序判断</span><span id="smLabel"></span></div>
-    </div>
+    <div class="src-note" id="smDeadline"></div>
     <label class="field">
       <span>提醒日期</span>
       <input type="date" id="smDate">

@@ -15,7 +15,7 @@
     {% if show_remind and j.remind_on %}
       {% set dleft = j.remind_on|days_until %}
       <span class="badge remind {{ 'urgent' if dleft is not none and dleft <= 3 }}">
-        提醒 {{ j.remind_on|fdate }}{% if dleft is not none %}（{{ '今天' if dleft==0 else ('逾期 ' ~ -dleft ~ ' 天' if dleft<0 else '还有 ' ~ dleft ~ ' 天') }}）{% endif %}
+        提醒 {{ j.remind_on|fdate }}{% if dleft is not none %}（{{ '今天' if dleft==0 else ('逾期 ' ~ -dleft ~ ' 天' if dleft<0 else '剩余 ' ~ dleft ~ ' 天') }}）{% endif %}
       </span>
     {% endif %}
   </div>

@@ -38,9 +38,9 @@ async function toggleStar(btn) {
   if (!s.ok) { toast(s.error || '出错了'); return; }
 
   document.getElementById('smTitle').textContent = btn.dataset.title || '';
-  document.getElementById('smRaw').textContent = s.deadline_raw || '（该来源没有截止日期字段）';
-  document.getElementById('smLabel').textContent = s.label
-    + (s.basis === 'deadline' ? ' → 采用这个日期' : ' → 预填为 7 天后');
+  // 抽出日期就显示日期；抽不出但原文有话（Rolling 之类）就照搬原文；两者都无才是暂无
+  document.getElementById('smDeadline').textContent =
+    '招聘截止日期：' + (s.parsed || s.deadline_raw || '暂无');
   document.getElementById('smDate').value = s.remind_on;
   document.getElementById('smNote').value = '';
   document.getElementById('smDate').dataset.basis = s.basis;
@@ -91,7 +91,7 @@ async function confirmStar() {
   const btn = document.querySelector('.star[data-key="' + CSS.escape(pendingKey) + '"]');
   if (btn) { btn.classList.add('on'); btn.textContent = '★'; }
   closeStar();
-  toast('已收藏，' + (dateEl.value ? dateEl.value + ' 提醒你' : '未设提醒'));
+  toast(dateEl.value ? '已收藏·将于' + dateEl.value + '提醒' : '已收藏·未设提醒');
 }
 
 /* ---------------- 其他动作 ---------------- */
@@ -105,14 +105,16 @@ async function markRead(btn) {
 async function refreshData(btn) {
   btn.disabled = true;
   const old = btn.textContent;
-  btn.textContent = '同步中…';
+  btn.textContent = '检查中…';
   const r = await post('/api/refresh', {});
   btn.disabled = false;
   btn.textContent = old;
-  if (!r.ok) { toast('同步失败：' + r.error); return; }
+  if (!r.ok) { toast('抓取失败：' + r.error); return; }
   const d = r.result;
-  toast('新增 ' + d.added + ' · 下架 ' + d.closed + ' · 在库 ' + d.total);
-  if (d.added || d.closed) setTimeout(() => location.reload(), 900);
+  const failed = Object.keys(d.failures || {}).length;
+  toast('新增 ' + d.added + ' · 下架 ' + d.closed + ' · 在招 ' + d.total
+        + (failed ? '（' + failed + ' 个来源抓取失败）' : ''));
+  if (d.added || d.closed) setTimeout(() => location.reload(), 1200);
 }
 
 /* ---------------- 键盘 ---------------- */

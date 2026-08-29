@@ -71,12 +71,12 @@ def page_index(conn, query):
             groups.append({"day": job["first_seen"], "jobs": []})
         groups[-1]["jobs"].append(job)
 
-    horizon = (date.today() + timedelta(days=14)).isoformat()
+    horizon = (date.today() + timedelta(days=7)).isoformat()
     upcoming = [j for j in db.reminders_between(conn, "1970-01-01", horizon) if not j["done"]]
 
     return render("index.html", conn=conn, groups=groups, fresh_count=len(fresh),
                   upcoming=upcoming,
-                  last_ingest=db.get_meta(conn, "last_ingest_at"),
+                  last_ingest=db.get_meta(conn, "last_fetch_at"),
                   initialized_on=db.get_meta(conn, "initialized_on"),
                   nav="index")
 
@@ -171,9 +171,9 @@ def api_mark_read(conn, payload):
 
 
 def api_refresh(conn, payload):
-    """重新读取邮件版的 state.json（只读）。"""
+    """现场访问三个网站，抓取最新岗位。"""
     try:
-        return {"ok": True, "result": ingest.ingest(conn)}
+        return {"ok": True, "result": ingest.refresh(conn)}
     except Exception as exc:                                  # noqa: BLE001
         return {"ok": False, "error": str(exc)}
 
@@ -252,19 +252,20 @@ def main():
     ap = argparse.ArgumentParser(description="predoc 岗位浏览器")
     ap.add_argument("--port", type=int, default=PORT)
     ap.add_argument("--no-browser", action="store_true", help="不自动打开浏览器")
-    ap.add_argument("--no-refresh", action="store_true", help="启动时不重新读取 state.json")
+    ap.add_argument("--no-fetch", action="store_true", help="启动时不抓取，直接用库里已有的数据")
     ap.add_argument("--verbose", action="store_true")
     args = ap.parse_args()
 
     conn = db.connect()
     db.init(conn)
-    if not args.no_refresh:
+    if not args.no_fetch:
+        print("正在检查三个来源…")
         try:
-            r = ingest.ingest(conn)
-            print("已同步 state.json：新增 %d · 下架 %d · 在库 %d"
-                  % (r["added"], r["closed"], r["total"]))
+            r = ingest.refresh(conn, verbose=True)
+            for sid, err in r["failures"].items():
+                print("  ! %s 抓取失败：%s" % (ingest.fetch.SOURCE_BY_ID[sid]["name"], err))
         except Exception as exc:                              # noqa: BLE001
-            print("同步 state.json 失败（不影响浏览已有数据）：%s" % exc)
+            print("抓取失败（不影响浏览库里已有的岗位）：%s" % exc)
     conn.close()
 
     url = "http://%s:%d/" % (HOST, args.port)

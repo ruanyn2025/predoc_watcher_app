@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 {% from "_card.html" import card %}
-{% block title %}收藏夹 · 岗位浏览器{% endblock %}
+{% block title %}收藏夹 · Predoc Watcher{% endblock %}
 {% block body %}
 <section class="panel">
   <h2>收藏夹 <span class="dim">按提醒日期排序</span></h2>
   {% if active %}
     <div class="cards">{% for j in active %}{{ card(j, show_remind=true) }}{% endfor %}</div>
   {% else %}
-    <p class="empty">还没有收藏。在首页或历史列表里点 ☆ 就能加进来，并设一个提醒日期。</p>
+    <p class="empty">还没有收藏。在首页或历史列表里点 ☆ 收藏岗位，并设一个提醒日期。</p>
   {% endif %}
 </section>
 

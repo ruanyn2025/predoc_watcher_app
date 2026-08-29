@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% from "_card.html" import card %}
-{% block title %}历史列表 · 岗位浏览器{% endblock %}
+{% block title %}历史列表 · Predoc Watcher{% endblock %}
 {% block body %}
 <section class="panel">
   <h2>历史列表</h2>
@@ -27,13 +27,13 @@
   </form>
 
   <p class="dim result-line">
-    命中 {{ count }} 条{% if q %}，关键词「{{ q }}」{% endif %}
+    {{ count }} 条结果
   </p>
 
   {% if jobs %}
     <div class="cards">{% for j in jobs %}{{ card(j) }}{% endfor %}</div>
   {% else %}
-    <p class="empty">没有匹配的岗位。试试更宽的关键词，比如只搜 <code>labor</code> 或 <code>Harvard</code>。</p>
+    <p class="empty">没有匹配的岗位，换个词试试</p>
   {% endif %}
 </section>
 {% endblock %}
