@@ -49,7 +49,6 @@ class Shell:
         self.httpd = None
         self.quitting = False
         self.wake = threading.Event()      # 用来叫醒后台抓取线程
-        self.first_hide = True
 
     # ---------------------------------------------------------- HTTP 服务
 
@@ -70,9 +69,6 @@ class Shell:
         if self.quitting:
             return True
         self.window.hide()
-        if self.first_hide:
-            self.first_hide = False
-            self.notify("已最小化到托盘，仍在后台检查新岗位。右键托盘图标可退出。")
         self.wake.set()                    # 顺手后台抓一次
         return False
 
