@@ -13,10 +13,56 @@
 要真正退出，**右键托盘图标 → 退出**。左键托盘图标把窗口叫回来；
 重复双击 `启动.bat` 也只会叫回已有窗口，不会开出第二个实例。
 
+### 装进「开始」菜单
+
+想在开始菜单的应用列表里找到它（而不是每次去翻文件夹）：
+
+```powershell
+.\install_shortcut.ps1
+```
+
+```powershell
+.\install_shortcut.ps1 -Desktop     # 顺带一个桌面快捷方式
+.\install_shortcut.ps1 -Startup     # 顺带开机自启（缩到托盘启动，不弹窗）
+.\install_shortcut.ps1 -Uninstall   # 全部移除
+```
+
+快捷方式直接指向解释器而不是 `启动.bat` —— 走 `.bat` 会闪一下黑框。
+
+### 指定 Python 解释器
+
+不配置也能跑：默认用 PATH 里的 `pythonw`。只有当你的 Python 不在 PATH 上
+（比如装在 conda 环境或虚拟环境里）才需要指定。三种改法，按优先级：
+
+| 方式 | 怎么做 | 适合 |
+|---|---|---|
+| 环境变量 | 设 `PREDOC_PYTHON` 为解释器完整路径 | 想全局生效、不改仓库里的文件 |
+| **`python_path.txt`** | 在 `webapp/` 下建这个文件，里面写一行完整路径 | **虚拟环境 / conda 环境，推荐** |
+| PATH | 什么都不做 | 系统装的 Python |
+
+`python_path.txt` 已在 `.gitignore` 里，各人的路径不会互相覆盖。
+`install_shortcut.ps1` 用的是同一套查找顺序。
+
+**用虚拟环境的话**：
+
+```powershell
+python -m venv .venv
+.venv\Scripts\pip install -r requirements.txt
+```
+
+然后把解释器路径写进 `python_path.txt`（用 `pythonw.exe` 不弹黑框）：
+
+```
+C:\完整路径\.venv\Scripts\pythonw.exe
+```
+
+注意**不能靠「先激活 venv 再双击」** —— 双击启动器会开一个新进程，
+继承不到你在终端里激活的环境。所以必须把路径写下来。
+
 命令行等价写法：
 
 ```
-D:\miniforge3\envs\dc1\python.exe desktop.py
+python desktop.py
 ```
 
 | 参数 | 作用 |
@@ -148,6 +194,8 @@ ingest.py        抓取结果 -> jobs.db
 deadlines.py     截止日期解析（脏数据全在这里对付）
 extra_ca/        predoc.org 缺失的中间证书，见下
 make_icon.py     生成图标（像素画，改了重跑一次）
+install_shortcut.ps1  把软件装进开始菜单 / 桌面 / 开机自启
+python_path.txt  你的解释器路径（可选，已 gitignore）
 app.ico          窗口 / 任务栏 / 托盘图标，由 make_icon.py 生成
 templates/       jinja2 模板
 static/          样式与前端脚本
