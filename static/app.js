@@ -58,10 +58,31 @@ function ymd(d) {
 let pendingKey = null;
 let editing = false;         // true = 这条已经收藏过，面板是在改而不是在建
 
-/* 点 ☆ 收藏；点已亮的 ★ 打开编辑面板（而不是直接取消收藏）。
-   直接取消太危险 —— 一次误点就把提醒日期和备注一起抹了，且无法撤销。
-   取消收藏挪进面板里，需要多一步确认动作。 */
+/* ☆ 收藏 / ★ 取消收藏。已收藏的卡片另有一个「编辑」按钮走 openEdit()。 */
 async function toggleStar(btn) {
+  const key = btn.dataset.key;
+  if (btn.classList.contains('on')) {
+    const r = await post('/api/unstar', { key });
+    if (!r.ok) { toast(r.error || S('toast.error')); return; }
+    btn.classList.remove('on');
+    btn.textContent = '☆';
+    const ed = btn.parentElement.querySelector('.edit');
+    if (ed) ed.remove();
+    toast(S('toast.unstarred'));
+    if (/\/starred|\/calendar/.test(location.pathname)) {
+      setTimeout(() => location.reload(), 700);
+    }
+    return;
+  }
+  openPanel(btn);
+}
+
+/* 收藏夹里那个显式的「编辑」按钮 */
+function openEdit(btn) {
+  openPanel(btn);
+}
+
+async function openPanel(btn) {
   const key = btn.dataset.key;
   pendingKey = key;
   const s = await post('/api/suggest', { key });
@@ -122,7 +143,12 @@ async function unstarFromModal() {
   const r = await post('/api/unstar', { key });
   if (!r.ok) { toast(r.error || S('toast.error')); return; }
   const btn = document.querySelector('.star[data-key="' + CSS.escape(key) + '"]');
-  if (btn) { btn.classList.remove('on'); btn.textContent = '☆'; }
+  if (btn) {
+    btn.classList.remove('on');
+    btn.textContent = '☆';
+    const ed = btn.parentElement.querySelector('.edit');
+    if (ed) ed.remove();
+  }
   closeStar();
   toast(S('toast.unstarred'));
   if (/\/starred|\/calendar/.test(location.pathname)) {
