@@ -48,7 +48,7 @@
 
 <div id="starModal" class="modal" hidden>
   <div class="modal-box">
-    <h3>{{ t('modal.title') }}</h3>
+    <h3 id="smHeading">{{ t('modal.title') }}</h3>
     <p class="job-title" id="smTitle"></p>
     <div class="src-note" id="smDeadline"></div>
     <label class="field">
@@ -61,8 +61,10 @@
       <input type="text" id="smNote" placeholder="{{ t('modal.note_ph') }}">
     </label>
     <div class="modal-actions">
+      <button class="btn danger" id="smUnstar" onclick="unstarFromModal()" hidden>{{ t('modal.unstar') }}</button>
+      <div class="spacer"></div>
       <button class="btn ghost" onclick="closeStar()">{{ t('modal.cancel') }}</button>
-      <button class="btn primary" onclick="confirmStar()">{{ t('modal.confirm') }}</button>
+      <button class="btn primary" id="smConfirm" onclick="confirmStar()">{{ t('modal.confirm') }}</button>
     </div>
   </div>
 </div>

@@ -141,15 +141,25 @@ def page_calendar(conn, query):
 
 
 def api_suggest(conn, payload):
-    """收藏面板打开时调用：给出预填日期和理由。"""
+    """收藏面板打开时调用。
+
+    没收藏过 -> 给一个预填建议；已经收藏过 -> 回传它当前存着的日期和备注，
+    否则一点开编辑就把用户改过的值覆盖成机器猜的了。
+    """
     job = db.get_job(conn, payload["key"])
     if not job:
         return {"ok": False, "error": "岗位不存在"}
     remind, info, basis = deadlines.suggest(job["deadline_raw"])
-    return {"ok": True, "remind_on": remind.isoformat(), "basis": basis,
-            "label": info["label"], "kind": info["kind"],
-            "deadline_raw": job["deadline_raw"] or "",
-            "parsed": info["date"].isoformat() if info["date"] else None}
+    out = {"ok": True, "remind_on": remind.isoformat(), "basis": basis,
+           "label": info["label"], "kind": info["kind"],
+           "deadline_raw": job["deadline_raw"] or "",
+           "parsed": info["date"].isoformat() if info["date"] else None,
+           "starred": bool(job["starred"]), "note": ""}
+    if job["starred"]:
+        out["remind_on"] = job["remind_on"] or ""
+        out["basis"] = job["remind_basis"] or "manual"
+        out["note"] = job["note"] or ""
+    return out
 
 
 def api_star(conn, payload):

@@ -5,7 +5,7 @@
     <button class="star {{ 'on' if j.starred }}"
             data-key="{{ j.key }}" data-title="{{ j.title }}"
             onclick="toggleStar(this)"
-            title="{{ t('card.unstar') if j.starred else t('card.star') }}">{{ '★' if j.starred else '☆' }}</button>
+            title="{{ t('card.edit') if j.starred else t('card.star') }}">{{ '★' if j.starred else '☆' }}</button>
   </div>
 
   <div class="badges">

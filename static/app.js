@@ -56,24 +56,31 @@ function ymd(d) {
 /* ---------------- 收藏 ---------------- */
 
 let pendingKey = null;
+let editing = false;         // true = 这条已经收藏过，面板是在改而不是在建
 
+/* 点 ☆ 收藏；点已亮的 ★ 打开编辑面板（而不是直接取消收藏）。
+   直接取消太危险 —— 一次误点就把提醒日期和备注一起抹了，且无法撤销。
+   取消收藏挪进面板里，需要多一步确认动作。 */
 async function toggleStar(btn) {
   const key = btn.dataset.key;
-  if (btn.classList.contains('on')) {
-    const r = await post('/api/unstar', { key });
-    if (r.ok) { btn.classList.remove('on'); btn.textContent = '☆'; toast(S('toast.unstarred')); }
-    return;
-  }
   pendingKey = key;
   const s = await post('/api/suggest', { key });
   if (!s.ok) { toast(s.error || S('toast.error')); return; }
+  editing = !!s.starred;
+
+  // 面板有两种形态：新收藏 vs 编辑已有的
+  document.getElementById('smHeading').textContent =
+    S(editing ? 'modal.edit_title' : 'modal.title');
+  document.getElementById('smConfirm').textContent =
+    S(editing ? 'modal.save' : 'modal.confirm');
+  document.getElementById('smUnstar').hidden = !editing;
 
   document.getElementById('smTitle').textContent = btn.dataset.title || '';
   // 抽出日期就显示日期；抽不出但原文有话（Rolling 之类）就照搬原文；两者都无才是暂无
   document.getElementById('smDeadline').textContent =
     S('modal.deadline') + (s.parsed || s.deadline_raw || S('modal.none'));
   document.getElementById('smDate').value = s.remind_on;
-  document.getElementById('smNote').value = '';
+  document.getElementById('smNote').value = s.note || '';   // 编辑时带出原备注
   document.getElementById('smDate').dataset.basis = s.basis;
 
   // 快捷按钮：解析出日期时给"提前几天"，否则给几个常用间隔
@@ -106,6 +113,21 @@ async function toggleStar(btn) {
 function closeStar() {
   document.getElementById('starModal').hidden = true;
   pendingKey = null;
+  editing = false;
+}
+
+async function unstarFromModal() {
+  if (!pendingKey) return;
+  const key = pendingKey;
+  const r = await post('/api/unstar', { key });
+  if (!r.ok) { toast(r.error || S('toast.error')); return; }
+  const btn = document.querySelector('.star[data-key="' + CSS.escape(key) + '"]');
+  if (btn) { btn.classList.remove('on'); btn.textContent = '☆'; }
+  closeStar();
+  toast(S('toast.unstarred'));
+  if (/\/starred|\/calendar/.test(location.pathname)) {
+    setTimeout(() => location.reload(), 700);
+  }
 }
 
 async function confirmStar() {
@@ -121,9 +143,15 @@ async function confirmStar() {
 
   const btn = document.querySelector('.star[data-key="' + CSS.escape(pendingKey) + '"]');
   if (btn) { btn.classList.add('on'); btn.textContent = '★'; }
+  const wasEditing = editing;
   closeStar();
-  toast(dateEl.value ? S('toast.starred', { date: dateEl.value })
-                     : S('toast.starred_no_date'));
+  const key = wasEditing ? 'toast.updated' : 'toast.starred';
+  toast(dateEl.value ? S(key, { date: dateEl.value })
+                     : S(wasEditing ? 'toast.updated_no_date' : 'toast.starred_no_date'));
+  // 收藏夹和日历按提醒日期排版，改完得重排
+  if (wasEditing && /\/starred|\/calendar/.test(location.pathname)) {
+    setTimeout(() => location.reload(), 700);
+  }
 }
 
 /* ---------------- 其他动作 ---------------- */

@@ -104,6 +104,8 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:-1px}
   background:var(--card);color:var(--ink);cursor:pointer;white-space:nowrap}
 .btn.primary{background:var(--bright);border-color:var(--bright);color:var(--on-bright);font-weight:600}
 .btn.ghost:hover{border-color:var(--accent);color:var(--accent)}
+.btn.danger{color:var(--dim)}
+.btn.danger:hover{border-color:#c0392b;color:#c0392b}
 .btn:disabled{opacity:.5;cursor:default}
 
 /* 日历 */
@@ -143,7 +145,8 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:-1px}
 .quick button{font-size:12px;padding:3px 9px;border-radius:20px;border:1px solid var(--line);
   background:var(--card);color:var(--dim);cursor:pointer}
 .quick button:hover{border-color:var(--accent);color:var(--accent)}
-.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:4px}
+.modal-actions{display:flex;align-items:center;gap:8px;margin-top:4px}
+.modal-actions .spacer{flex:1}
 
 /* 提示条 */
 #toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
