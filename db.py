@@ -47,12 +47,32 @@ CREATE TABLE IF NOT EXISTS stars (
     remind_on    TEXT,            -- YYYY-MM-DD，可为空表示不提醒
     remind_basis TEXT,            -- deadline | rolling | manual
     note         TEXT,
-    done         INTEGER NOT NULL DEFAULT 0
+    done         INTEGER NOT NULL DEFAULT 0,
+    applied_at   TEXT,            -- 点「完成投递」的日期；非空即进入申请追踪页
+    stage        TEXT             -- applied | test | interview | closed
 );
-CREATE INDEX IF NOT EXISTS idx_stars_remind ON stars(remind_on);
+CREATE INDEX IF NOT EXISTS idx_stars_remind  ON stars(remind_on);
+
+-- 申请追踪页上的自由标注。三类（事件 / 标签 / 链接）共用一张表，
+-- 因为它们都是"一个岗位对多条、内容自由"，而且这样以后加第四类不用改表。
+CREATE TABLE IF NOT EXISTS annotations (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    key        TEXT NOT NULL,     -- 岗位主键
+    kind       TEXT NOT NULL,     -- event | tag | link
+    label      TEXT DEFAULT '',   -- 事件名 / 标签文字 / 链接标题
+    value      TEXT DEFAULT '',   -- 链接 URL（其余类型不用）
+    on_date    TEXT,              -- 仅 event：YYYY-MM-DD
+    done       INTEGER NOT NULL DEFAULT 0,   -- 仅 event：过掉了
+    created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_ann_key  ON annotations(key);
+CREATE INDEX IF NOT EXISTS idx_ann_date ON annotations(on_date);
 
 CREATE TABLE IF NOT EXISTS meta (k TEXT PRIMARY KEY, v TEXT);
 """
+
+# 申请阶段。closed 折到页面底部，正好接管那个从来没被用起来的 done 字段。
+STAGES = ("applied", "test", "interview", "closed")
 
 
 def connect():
@@ -64,10 +84,17 @@ def connect():
 
 def init(conn):
     conn.executescript(SCHEMA)
-    # 迁移：早期版本的库没有 unread 列
+    # 迁移：老库缺列时补上。CREATE TABLE IF NOT EXISTS 不会给已存在的表加列。
     cols = {r["name"] for r in conn.execute("PRAGMA table_info(jobs)")}
     if "unread" not in cols:
         conn.execute("ALTER TABLE jobs ADD COLUMN unread INTEGER NOT NULL DEFAULT 0")
+    scols = {r["name"] for r in conn.execute("PRAGMA table_info(stars)")}
+    if "applied_at" not in scols:
+        conn.execute("ALTER TABLE stars ADD COLUMN applied_at TEXT")
+    if "stage" not in scols:
+        conn.execute("ALTER TABLE stars ADD COLUMN stage TEXT")
+    # 这条索引必须等上面的 ALTER 跑完 —— 老库里 applied_at 那时才存在
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_stars_applied ON stars(applied_at)")
     conn.commit()
 
 
@@ -177,12 +204,12 @@ def mark_all_read(conn):
 
 
 def starred_jobs(conn, include_done=True):
-    sql = ("SELECT j.*, 1 AS starred, s.starred_at, s.remind_on, s.remind_basis, s.note, s.done "
-           "FROM stars s JOIN jobs j ON j.key = s.key ")
-    if not include_done:
-        sql += "WHERE s.done = 0 "
-    sql += "ORDER BY s.done ASC, s.remind_on IS NULL, s.remind_on ASC"
-    return _rows(conn.execute(sql))
+    """收藏夹：**只含尚未投递的**。投过的搬去 applications()。"""
+    return _rows(conn.execute(
+        "SELECT j.*, 1 AS starred, s.remind_on, s.note, s.done, s.starred_at "
+        "FROM stars s JOIN jobs j ON j.key = s.key "
+        "WHERE s.applied_at IS NULL "
+        "ORDER BY s.remind_on IS NULL, s.remind_on, j.title"))
 
 
 def reminders_between(conn, start, end):
@@ -218,8 +245,113 @@ def stats(conn):
     row = conn.execute(
         "SELECT COUNT(*) n, SUM(status='open') opened, SUM(status='closed') closed FROM jobs"
     ).fetchone()
-    starred = conn.execute("SELECT COUNT(*) n FROM stars").fetchone()["n"]
+    # 已投递的不算在收藏数里 —— 它们已经搬去申请追踪页了，
+    # 否则导航角标会比收藏页实际条数多。
+    starred = conn.execute(
+        "SELECT COUNT(*) n FROM stars WHERE applied_at IS NULL").fetchone()["n"]
     per_source = {r["source"]: r["n"] for r in conn.execute(
         "SELECT source, COUNT(*) n FROM jobs WHERE status='open' GROUP BY source")}
     return {"total": row["n"] or 0, "open": row["opened"] or 0,
-            "closed": row["closed"] or 0, "starred": starred, "per_source": per_source}
+            "closed": row["closed"] or 0, "starred": starred,
+            "per_source": per_source, "applications": count_applications(conn)}
+
+
+# ------------------------------------------------------- 申请追踪
+
+def mark_applied(conn, key, on=None):
+    """标记为已投递。没收藏过也能直接投 —— 那就顺手先建一条收藏记录。"""
+    on = on or date.today().isoformat()
+    conn.execute(
+        "INSERT INTO stars(key, starred_at, remind_on, remind_basis, note, applied_at, stage) "
+        "VALUES(?, ?, NULL, 'manual', '', ?, 'applied') "
+        "ON CONFLICT(key) DO UPDATE SET applied_at = excluded.applied_at, "
+        "  stage = COALESCE(NULLIF(stars.stage, ''), 'applied')",
+        (key, on, on))
+    conn.commit()
+
+
+def unmark_applied(conn, key):
+    """撤回投递标记，退回收藏夹。标注不删 —— 误点一下不该毁掉写过的东西。"""
+    conn.execute("UPDATE stars SET applied_at = NULL, stage = NULL WHERE key = ?", (key,))
+    conn.commit()
+
+
+def set_stage(conn, key, stage):
+    if stage not in STAGES:
+        raise ValueError("未知阶段：%s" % stage)
+    conn.execute("UPDATE stars SET stage = ? WHERE key = ?", (stage, key))
+    conn.commit()
+
+
+def applications(conn):
+    return _rows(conn.execute(
+        "SELECT j.*, 1 AS starred, s.remind_on, s.note, s.applied_at, "
+        "       COALESCE(NULLIF(s.stage, ''), 'applied') AS stage "
+        "FROM stars s JOIN jobs j ON j.key = s.key "
+        "WHERE s.applied_at IS NOT NULL "
+        "ORDER BY s.applied_at DESC, j.title"))
+
+
+def count_applications(conn, exclude_closed=True):
+    sql = "SELECT COUNT(*) c FROM stars WHERE applied_at IS NOT NULL"
+    if exclude_closed:
+        sql += " AND COALESCE(NULLIF(stage, ''), 'applied') <> 'closed'"
+    return conn.execute(sql).fetchone()["c"]
+
+
+# ------------------------------------------------------- 自由标注
+
+ANNOTATION_KINDS = ("event", "tag", "link")
+
+
+def add_annotation(conn, key, kind, label="", value="", on_date=None):
+    if kind not in ANNOTATION_KINDS:
+        raise ValueError("未知标注类型：%s" % kind)
+    cur = conn.execute(
+        "INSERT INTO annotations(key, kind, label, value, on_date, created_at) "
+        "VALUES(?, ?, ?, ?, ?, ?)",
+        (key, kind, label or "", value or "", on_date or None,
+         date.today().isoformat()))
+    conn.commit()
+    return cur.lastrowid
+
+
+def update_annotation(conn, ann_id, **fields):
+    allowed = {"label", "value", "on_date", "done"}
+    sets = {k: v for k, v in fields.items() if k in allowed}
+    if not sets:
+        return
+    conn.execute("UPDATE annotations SET %s WHERE id = ?"
+                 % ", ".join("%s = ?" % k for k in sets),
+                 (*sets.values(), ann_id))
+    conn.commit()
+
+
+def delete_annotation(conn, ann_id):
+    conn.execute("DELETE FROM annotations WHERE id = ?", (ann_id,))
+    conn.commit()
+
+
+def annotations_for(conn, keys):
+    """一次查回多个岗位的标注，按岗位分组 —— 免得渲染列表时每行一个查询。"""
+    keys = list(keys)
+    if not keys:
+        return {}
+    rows = _rows(conn.execute(
+        "SELECT * FROM annotations WHERE key IN (%s) "
+        "ORDER BY kind, on_date IS NULL, on_date, id" % ",".join("?" * len(keys)),
+        keys))
+    out = {}
+    for r in rows:
+        out.setdefault(r["key"], {"event": [], "tag": [], "link": []})
+        out[r["key"]].setdefault(r["kind"], []).append(r)
+    return out
+
+
+def annotation_events_between(conn, start, end):
+    """日历用：申请事件，带上所属岗位的标题。"""
+    return _rows(conn.execute(
+        "SELECT a.*, j.title, j.link, j.source FROM annotations a "
+        "JOIN jobs j ON j.key = a.key "
+        "WHERE a.kind = 'event' AND a.on_date BETWEEN ? AND ? "
+        "ORDER BY a.on_date, a.id", (start, end)))

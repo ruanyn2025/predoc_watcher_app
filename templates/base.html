@@ -15,6 +15,7 @@
       <a href="/"         class="{{ 'on' if nav=='index' }}">{{ t('nav.new') }}</a>
       <a href="/history"  class="{{ 'on' if nav=='history' }}">{{ t('nav.history') }}</a>
       <a href="/starred"  class="{{ 'on' if nav=='starred' }}">{{ t('nav.starred') }}{% if stats.starred %} <b>{{ stats.starred }}</b>{% endif %}</a>
+      <a href="/applications" class="{{ 'on' if nav=='apps' }}">{{ t('nav.apps') }}{% if stats.applications %} <b>{{ stats.applications }}</b>{% endif %}</a>
       <a href="/calendar" class="{{ 'on' if nav=='calendar' }}">{{ t('nav.calendar') }}</a>
     </nav>
     <div class="spacer"></div>

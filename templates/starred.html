@@ -5,7 +5,7 @@
 <section class="panel">
   <h2>{{ t('starred.title') }} <span class="dim">{{ t('starred.sub') }}</span></h2>
   {% if active %}
-    <div class="cards">{% for j in active %}{{ card(j, show_remind=true) }}{% endfor %}</div>
+    <div class="cards">{% for j in active %}{{ card(j, show_remind=true, show_apply=true) }}{% endfor %}</div>
   {% else %}
     <p class="empty">{{ t('starred.empty') }}</p>
   {% endif %}
@@ -14,7 +14,7 @@
 {% if done %}
 <section class="panel muted">
   <h2>{{ t('starred.done') }} <span class="dim">{{ t('starred.done_n', n=done|length) }}</span></h2>
-  <div class="cards">{% for j in done %}{{ card(j, show_remind=true) }}{% endfor %}</div>
+  <div class="cards">{% for j in done %}{{ card(j, show_remind=true, show_apply=true) }}{% endfor %}</div>
 </section>
 {% endif %}
 {% endblock %}

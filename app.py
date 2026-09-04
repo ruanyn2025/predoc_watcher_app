@@ -35,6 +35,16 @@ env = Environment(
 )
 
 
+def _days_since(value):
+    if not value:
+        return None
+    try:
+        d = datetime.strptime(str(value)[:10], "%Y-%m-%d").date()
+    except ValueError:
+        return None
+    return (date.today() - d).days
+
+
 def _days_until(value):
     try:
         d = datetime.strptime(str(value)[:10], "%Y-%m-%d").date()
@@ -44,6 +54,7 @@ def _days_until(value):
 
 
 env.filters["days_until"] = _days_until
+env.filters["days_since"] = _days_since
 
 
 def render(name, **ctx):
@@ -104,6 +115,19 @@ def page_starred(conn, query):
                   done=[j for j in jobs if j["done"]], nav="starred", lang=lang)
 
 
+def page_applications(conn, query):
+    lang = current_lang(conn)
+    apps = db.applications(conn)
+    ann = db.annotations_for(conn, [a["key"] for a in apps])
+    groups = []
+    for stage in db.STAGES:
+        rows = [a for a in apps if a["stage"] == stage]
+        if rows:
+            groups.append({"stage": stage, "jobs": rows})
+    return render("applications.html", conn=conn, groups=groups, ann=ann,
+                  total=len(apps), stages=db.STAGES, nav="apps", lang=lang)
+
+
 def page_calendar(conn, query):
     lang = current_lang(conn)
     ym = query.get("ym", [""])[0] or date.today().strftime("%Y-%m")
@@ -116,9 +140,16 @@ def page_calendar(conn, query):
 
     nxt = date(year + (month == 12), month % 12 + 1, 1)
     last = nxt - timedelta(days=1)
+    # 两类事件混在同一个日历里：收藏提醒 + 申请追踪页上标的时间。
+    # 分开放两个页面的话，面试时间和收藏提醒各在一处，很容易漏看。
     by_day = {}
     for j in db.reminders_between(conn, first.isoformat(), last.isoformat()):
-        by_day.setdefault(j["remind_on"], []).append(j)
+        by_day.setdefault(j["remind_on"], []).append(
+            {"kind": "remind", "title": j["title"], "link": j["link"], "done": j["done"]})
+    for e in db.annotation_events_between(conn, first.isoformat(), last.isoformat()):
+        by_day.setdefault(e["on_date"], []).append(
+            {"kind": "event", "title": e["label"], "job": e["title"],
+             "link": e["link"], "done": e["done"]})
 
     start = first - timedelta(days=first.weekday())
     weeks, cur = [], start
@@ -178,6 +209,47 @@ def api_unstar(conn, payload):
     return {"ok": True}
 
 
+def api_apply(conn, payload):
+    db.mark_applied(conn, payload["key"])
+    return {"ok": True}
+
+
+def api_unapply(conn, payload):
+    db.unmark_applied(conn, payload["key"])
+    return {"ok": True}
+
+
+def api_stage(conn, payload):
+    try:
+        db.set_stage(conn, payload["key"], payload["stage"])
+    except ValueError as exc:
+        return {"ok": False, "error": str(exc)}
+    return {"ok": True}
+
+
+def api_ann_add(conn, payload):
+    try:
+        ann_id = db.add_annotation(
+            conn, payload["key"], payload["kind"],
+            label=payload.get("label", ""), value=payload.get("value", ""),
+            on_date=payload.get("on_date") or None)
+    except ValueError as exc:
+        return {"ok": False, "error": str(exc)}
+    return {"ok": True, "id": ann_id}
+
+
+def api_ann_update(conn, payload):
+    db.update_annotation(conn, payload["id"],
+                         **{k: payload[k] for k in ("label", "value", "on_date", "done")
+                            if k in payload})
+    return {"ok": True}
+
+
+def api_ann_delete(conn, payload):
+    db.delete_annotation(conn, payload["id"])
+    return {"ok": True}
+
+
 def api_done(conn, payload):
     db.set_done(conn, payload["key"], bool(payload.get("done")))
     return {"ok": True}
@@ -202,10 +274,13 @@ def api_refresh(conn, payload):
         return {"ok": False, "error": str(exc)}
 
 
-PAGES = {"/": page_index, "/history": page_history,
+PAGES = {"/": page_index, "/history": page_history, "/applications": page_applications,
          "/starred": page_starred, "/calendar": page_calendar}
 APIS = {"/api/lang": api_lang, "/api/suggest": api_suggest, "/api/star": api_star, "/api/unstar": api_unstar,
-        "/api/done": api_done, "/api/mark-read": api_mark_read, "/api/refresh": api_refresh}
+        "/api/done": api_done,
+        "/api/apply": api_apply, "/api/unapply": api_unapply, "/api/stage": api_stage,
+        "/api/annotation/add": api_ann_add, "/api/annotation/update": api_ann_update,
+        "/api/annotation/delete": api_ann_delete, "/api/mark-read": api_mark_read, "/api/refresh": api_refresh}
 
 
 class Handler(BaseHTTPRequestHandler):

@@ -214,3 +214,78 @@ document.addEventListener('keydown', (e) => {
 document.getElementById('starModal').addEventListener('click', (e) => {
   if (e.target.id === 'starModal') closeStar();
 });
+
+/* ---------------- 申请追踪 ---------------- */
+
+async function markApplied(btn) {
+  const r = await post('/api/apply', { key: btn.dataset.key });
+  if (!r.ok) { toast(r.error || S('toast.error')); return; }
+  toast(S('toast.applied'));
+  setTimeout(() => location.reload(), 600);   // 这条要从收藏夹搬走，得重排
+}
+
+async function unapply(btn) {
+  const r = await post('/api/unapply', { key: btn.dataset.key });
+  if (!r.ok) { toast(r.error || S('toast.error')); return; }
+  toast(S('toast.unapplied'));
+  setTimeout(() => location.reload(), 600);
+}
+
+async function setStage(sel) {
+  const r = await post('/api/stage', { key: sel.dataset.key, stage: sel.value });
+  if (!r.ok) { toast(r.error || S('toast.error')); return; }
+  setTimeout(() => location.reload(), 400);   // 页面按阶段分组，改完要换组
+}
+
+/* ---------------- 三类标注 ---------------- */
+
+let annKey = null, annKind = null;
+
+function openAnn(btn, kind) {
+  annKey = btn.dataset.key;
+  annKind = kind;
+  document.getElementById('anHeading').textContent = S('ann.add_' + kind);
+  document.getElementById('anLabelText').textContent =
+    S(kind === 'event' ? 'ann.event_name' : kind === 'link' ? 'ann.link_label' : 'ann.tag');
+  const label = document.getElementById('anLabel');
+  label.value = '';
+  label.placeholder = S('ann.' + (kind === 'event' ? 'event_ph'
+                                : kind === 'link' ? 'link_ph' : 'tag_ph'));
+  document.getElementById('anUrlWrap').hidden = kind !== 'link';
+  document.getElementById('anDateWrap').hidden = kind !== 'event';
+  document.getElementById('anUrl').value = '';
+  document.getElementById('anDate').value = new Date().toISOString().slice(0, 10);
+  document.getElementById('annModal').hidden = false;
+  label.focus();
+}
+
+function closeAnn() {
+  document.getElementById('annModal').hidden = true;
+  annKey = null; annKind = null;
+}
+
+async function saveAnn() {
+  if (!annKey) return;
+  const label = document.getElementById('anLabel').value.trim();
+  const url = document.getElementById('anUrl').value.trim();
+  const on = document.getElementById('anDate').value;
+  // 事件没有名字、链接没有地址，存下来就是一条看不懂的空记录
+  if (annKind === 'event' && !label) { toast(S('ann.need_name')); return; }
+  if (annKind === 'link' && !url) { toast(S('ann.need_url')); return; }
+  if (annKind === 'tag' && !label) { closeAnn(); return; }
+
+  const r = await post('/api/annotation/add', {
+    key: annKey, kind: annKind, label: label,
+    value: annKind === 'link' ? url : '',
+    on_date: annKind === 'event' ? on : null,
+  });
+  if (!r.ok) { toast(r.error || S('toast.error')); return; }
+  closeAnn();
+  location.reload();
+}
+
+async function delAnn(id) {
+  const r = await post('/api/annotation/delete', { id: id });
+  if (!r.ok) { toast(r.error || S('toast.error')); return; }
+  location.reload();
+}

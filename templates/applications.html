@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% from "_card.html" import card %}
+{% block title %}{{ t('apps.title') }} · Predoc Watcher{% endblock %}
+{% block body %}
+
+<section class="panel">
+  <h2>{{ t('apps.title') }} <span class="dim">{{ t('apps.sub') }}</span></h2>
+
+  {% if not groups %}
+    <p class="empty">{{ t('apps.empty') }}</p>
+  {% endif %}
+
+  {% for g in groups %}
+  <h4 class="daysep">{{ t('stage.' ~ g.stage) }} <span class="dim">{{ g.jobs|length }}</span></h4>
+  <div class="cards{{ ' closed-group' if g.stage == 'closed' }}">
+    {% for j in g.jobs %}
+    {% set a = ann.get(j.key, {}) %}
+    <article class="card app" data-key="{{ j.key }}">
+      <div class="card-head">
+        <h3><a href="{{ j.link }}" target="_blank" rel="noopener">{{ j.title or t('card.untitled') }}</a></h3>
+        <select class="stage-pick" onchange="setStage(this)" data-key="{{ j.key }}">
+          {% for st in stages %}
+          <option value="{{ st }}" {{ 'selected' if st == j.stage }}>{{ t('stage.' ~ st) }}</option>
+          {% endfor %}
+        </select>
+        <button class="btn tiny" onclick="unapply(this)" data-key="{{ j.key }}"
+                title="{{ t('apps.undo_hint') }}">{{ t('apps.undo') }}</button>
+      </div>
+
+      <div class="badges">
+        <span class="badge src">{{ source_label(j.source) }}</span>
+        <span class="badge date">{{ t('apps.applied_on', date=fdate(j.applied_at)) }}</span>
+        {% set d = j.applied_at|days_since %}
+        {% if d is not none %}
+        <span class="badge date">{{ t('apps.today') if d == 0 else t('apps.days_since', n=d) }}</span>
+        {% endif %}
+      </div>
+
+      <dl class="meta">
+        {% if j.institution %}<dt>{{ t('card.institution') }}</dt><dd>{{ j.institution }}</dd>{% endif %}
+        {% if j.researchers %}<dt>{{ t('card.researchers') }}</dt><dd>{{ j.researchers }}</dd>{% endif %}
+      </dl>
+
+      {# 三类标注各占一行，空的也留着入口，否则第一次用的人不知道能加东西 #}
+      <div class="anns">
+        <div class="ann-row" data-kind="event">
+          <span class="ann-label">{{ t('ann.event') }}</span>
+          <span class="ann-items">
+            {% for e in a.get('event', []) %}
+            <span class="chip ev{{ ' done' if e.done }}">
+              <b>{{ fdate(e.on_date) }}</b> {{ e.label }}
+              <button class="x" onclick="delAnn({{ e.id }})" title="{{ t('ann.delete') }}">×</button>
+            </span>
+            {% else %}<span class="dim">{{ t('ann.none') }}</span>{% endfor %}
+          </span>
+          <button class="btn tiny" onclick="openAnn(this,'event')" data-key="{{ j.key }}">+ {{ t('ann.add_event') }}</button>
+        </div>
+
+        <div class="ann-row" data-kind="tag">
+          <span class="ann-label">{{ t('ann.tag') }}</span>
+          <span class="ann-items">
+            {% for e in a.get('tag', []) %}
+            <span class="chip tag">{{ e.label }}
+              <button class="x" onclick="delAnn({{ e.id }})" title="{{ t('ann.delete') }}">×</button>
+            </span>
+            {% else %}<span class="dim">{{ t('ann.none') }}</span>{% endfor %}
+          </span>
+          <button class="btn tiny" onclick="openAnn(this,'tag')" data-key="{{ j.key }}">+ {{ t('ann.add_tag') }}</button>
+        </div>
+
+        <div class="ann-row" data-kind="link">
+          <span class="ann-label">{{ t('ann.link') }}</span>
+          <span class="ann-items">
+            {% for e in a.get('link', []) %}
+            <span class="chip link">
+              <a href="{{ e.value }}" target="_blank" rel="noopener">{{ e.label or e.value }}</a>
+              <button class="x" onclick="delAnn({{ e.id }})" title="{{ t('ann.delete') }}">×</button>
+            </span>
+            {% else %}<span class="dim">{{ t('ann.none') }}</span>{% endfor %}
+          </span>
+          <button class="btn tiny" onclick="openAnn(this,'link')" data-key="{{ j.key }}">+ {{ t('ann.add_link') }}</button>
+        </div>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% endfor %}
+</section>
+{% endblock %}

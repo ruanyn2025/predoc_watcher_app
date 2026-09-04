@@ -1,7 +1,15 @@
-{% macro card(j, show_remind=false) %}
+{% macro card(j, show_remind=false, show_apply=false) %}
 <article class="card {{ 'closed' if j.status=='closed' }}">
   <div class="card-head">
     <h3><a href="{{ j.link }}" target="_blank" rel="noopener">{{ j.title or t('card.untitled') }}</a></h3>
+    {% if j.starred and show_apply %}
+    <button class="btn tiny apply" data-key="{{ j.key }}"
+            onclick="markApplied(this)" title="{{ t('apps.mark_hint') }}">
+      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor"
+           stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M20 6 9 17l-5-5"/>
+      </svg>{{ t('apps.mark') }}</button>
+    {% endif %}
     {% if j.starred %}
     <button class="btn tiny edit" data-key="{{ j.key }}" data-title="{{ j.title }}"
             onclick="openEdit(this)" title="{{ t('card.edit_hint') }}">

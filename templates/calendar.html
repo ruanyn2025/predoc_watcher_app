@@ -22,14 +22,17 @@
       <div class="cal-cell {{ 'out' if not cell.in_month }} {{ 'today' if cell.date == today }}">
         <div class="dnum">{{ cell.date.day }}</div>
         {% for j in cell.jobs %}
-        <a class="ev {{ 'done' if j.done }}" href="{{ j.link }}" target="_blank" rel="noopener"
-           title="{{ j.title }} — {{ j.institution }}">{{ j.title }}</a>
+        <a class="ev {{ j.kind }}{{ ' done' if j.done }}" href="{{ j.link }}" target="_blank" rel="noopener"
+           title="{{ j.title }}{% if j.job %} — {{ j.job }}{% endif %}">{{ j.title }}</a>
         {% endfor %}
       </div>
       {% endfor %}
     </div>
     {% endfor %}
   </div>
-  <p class="dim">{{ t('cal.note') }}<a href="/starred">{{ t('nav.starred') }}</a>{{ t('cal.note_tail') }}</p>
+  <p class="dim">
+    <span class="legend"><i class="sw remind"></i>{{ t('cal.legend_remind') }}</span>
+    <span class="legend"><i class="sw event"></i>{{ t('cal.legend_event') }}</span>
+    <br>{{ t('cal.note') }}<a href="/starred">{{ t('nav.starred') }}</a>{{ t('cal.note_tail') }}</p>
 </section>
 {% endblock %}
