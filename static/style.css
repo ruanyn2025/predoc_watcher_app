@@ -2,7 +2,8 @@
    底面是中性的白/黑，橙只留给需要被看见的小元素 —— 数字气泡、星标、主按钮、
    当前页下划线。大面积铺橙会把这些强调点淹掉，反而看不出重点在哪。
 
-   --accent 是能安全承载文字的深橙（白底约 5:1）；--bright 是图标那支亮橙，
+   --accent 是承载文字的橙（白底 4.24:1，略低于 4.5 的正文达标线 —— 这是
+   刻意换来的视觉轻盈度）；--bright 是图标那支亮橙，
    只用来填色，其上的文字一律压近黑的 --on-bright —— 亮橙配白字对比度不够，
    配黑字反而有 10:1，也更像图标本身。
 
@@ -12,7 +13,7 @@
 :root{
   color-scheme:light;
   --bg:#ffffff; --card:#ffffff; --ink:#17171a; --dim:#71717a; --line:#e4e4e8;
-  --accent:#b05c07; --bright:#ea7a10; --on-bright:#1f1c18; --accent-soft:#fff2e2;
+  --accent:#bd6309; --bright:#ea7a10; --on-bright:#1f1c18; --accent-soft:#fff2e2;
   --gone:#a1a1aa; --radius:10px;
   --cal-remind:#8a6d00; --cal-remind-soft:#fbf0c4; --cal-remind-solid:#e3b505;
   --cal-event:#1d4ed8;  --cal-event-soft:#dbe6fe;  --cal-event-solid:#2563eb;
