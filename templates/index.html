@@ -3,15 +3,6 @@
 {% block title %}{{ t('index.title') }} · Predoc Watcher{% endblock %}
 {% block body %}
 
-{% if upcoming %}
-<section class="panel warn">
-  <h2>{{ t('index.upcoming') }}<span class="dim">{{ t('index.upcoming_sub') }}</span></h2>
-  <div class="cards">
-    {% for j in upcoming %}{{ card(j, show_remind=true) }}{% endfor %}
-  </div>
-</section>
-{% endif %}
-
 <section class="panel">
   <div class="panel-head">
     <h2>{% if fresh_count %}{{ t('index.unread', n=fresh_count) }}{% else %}{{ t('index.none') }}{% endif %}</h2>
@@ -31,4 +22,13 @@
     </p>
   {% endif %}
 </section>
+
+{% if upcoming %}
+<section class="panel">
+  <h2>{{ t('index.upcoming') }}<span class="dim">{{ t('index.upcoming_sub') }}</span></h2>
+  <div class="cards">
+    {% for j in upcoming %}{{ card(j, show_remind=true) }}{% endfor %}
+  </div>
+</section>
+{% endif %}
 {% endblock %}

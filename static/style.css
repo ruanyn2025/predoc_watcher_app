@@ -86,7 +86,6 @@ a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
 /* 面板 */
 .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
   padding:20px 22px;margin:20px 0}
-.panel.warn{border-color:var(--accent);background:var(--accent-soft)}
 .panel.muted{opacity:.72}
 .panel h2{font-size:17px;margin:0 0 14px}
 .panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
