@@ -370,7 +370,9 @@ def annotations_for(conn, keys):
 def annotation_events_between(conn, start, end):
     """日历用：申请事件，带上所属岗位的标题。"""
     return _rows(conn.execute(
-        "SELECT a.*, j.title, j.link, j.source FROM annotations a "
-        "JOIN jobs j ON j.key = a.key "
+        "SELECT a.*, j.title, j.link, j.source, j.institution, j.researchers, "
+        "       st.applied_at "
+        "FROM annotations a JOIN jobs j ON j.key = a.key "
+        "LEFT JOIN stars st ON st.key = a.key "
         "WHERE a.kind = 'event' AND a.on_date BETWEEN ? AND ? "
         "ORDER BY a.on_date, a.id", (start, end)))

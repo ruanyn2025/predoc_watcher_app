@@ -1,6 +1,6 @@
 {% from "_anns.html" import anns with context %}
 {% macro card(j, show_remind=false, show_apply=false, a=none) %}
-<article class="card {{ 'closed' if j.status=='closed' }}">
+<article class="card {{ 'closed' if j.status=='closed' }}" id="job-{{ j.key }}">
   <div class="card-head">
     <h3><a href="{{ j.link }}" target="_blank" rel="noopener">{{ j.title or t('card.untitled') }}</a></h3>
     {% if j.starred and show_apply %}

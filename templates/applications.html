@@ -15,7 +15,7 @@
   <div class="cards{{ ' closed-group' if g.stage == 'closed' }}">
     {% for j in g.jobs %}
     {% set a = ann.get(j.key, {}) %}
-    <article class="card app" data-key="{{ j.key }}">
+    <article class="card app" data-key="{{ j.key }}" id="job-{{ j.key }}">
       <div class="card-head">
         <h3><a href="{{ j.link }}" target="_blank" rel="noopener">{{ j.title or t('card.untitled') }}</a></h3>
         <select class="stage-pick" onchange="setStage(this)" data-key="{{ j.key }}">

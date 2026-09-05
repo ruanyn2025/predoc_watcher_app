@@ -288,3 +288,55 @@ async function delAnn(id) {
   if (!r.ok) { toast(r.error || S('toast.error')); return; }
   location.reload();
 }
+
+/* ---------------- 日历浮窗 ---------------- */
+
+/* 光标停在日历标记上时，显示这条对应的岗位细节。用自绘浮窗而不是 title 属性：
+   原生 tooltip 要等一秒才出、样式不可控，而且没法分行显示机构和导师。 */
+(function () {
+  const pop = document.getElementById('calPop');
+  if (!pop) return;
+
+  function show(a) {
+    const d = a.dataset;
+    let html = '<span class="pk">' + esc(d.kind) + '</span>' +
+               '<div class="pt">' + esc(d.label) + '</div>';
+    if (d.job && d.job !== d.label) html += '<div class="pj">' + esc(d.job) + '</div>';
+    html += '<dl>';
+    if (d.inst) html += '<dt>' + esc(S('card.institution')) + '</dt><dd>' + esc(d.inst) + '</dd>';
+    if (d.res) html += '<dt>' + esc(S('card.researchers')) + '</dt><dd>' + esc(d.res) + '</dd>';
+    pop.innerHTML = html + '</dl>';
+    pop.hidden = false;
+    place(a);
+  }
+
+  function place(a) {
+    const r = a.getBoundingClientRect();
+    const p = pop.getBoundingClientRect();
+    // 窗口最小化时 innerWidth/innerHeight 会是 0，拿它做边界会把浮窗挤到角落
+    const vw = innerWidth || document.documentElement.clientWidth || 1200;
+    const vh = innerHeight || document.documentElement.clientHeight || 800;
+    // 默认贴在标记下方；下面放不下就翻到上方，右边越界就往左推
+    let top = r.bottom + 8;
+    if (top + p.height > vh - 8) top = Math.max(8, r.top - p.height - 8);
+    let left = r.left;
+    if (left + p.width > vw - 8) left = Math.max(8, vw - p.width - 8);
+    pop.style.top = Math.max(8, top) + 'px';
+    pop.style.left = Math.max(8, left) + 'px';
+  }
+
+  function esc(t) {
+    const d = document.createElement('div');
+    d.textContent = t == null ? '' : t;
+    return d.innerHTML;
+  }
+
+  document.addEventListener('mouseover', e => {
+    const a = e.target.closest('.ev');
+    if (a) show(a);
+  });
+  document.addEventListener('mouseout', e => {
+    if (e.target.closest('.ev')) pop.hidden = true;
+  });
+  document.addEventListener('scroll', () => { pop.hidden = true; }, true);
+})();

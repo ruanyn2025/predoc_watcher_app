@@ -144,14 +144,30 @@ def page_calendar(conn, query):
     last = nxt - timedelta(days=1)
     # 两类事件混在同一个日历里：收藏提醒 + 申请追踪页上标的时间。
     # 分开放两个页面的话，面试时间和收藏提醒各在一处，很容易漏看。
+    # 日历上的两类：收藏提醒、申请追踪里自定义的时间点。
+    # 点日历上的条目跳回它所属的那一页（而不是岗位官网）—— 你在日历上想做的
+    # 是"去处理它"，而不是"再读一遍招聘启事"。
+    def near(d):
+        try:
+            return (datetime.strptime(d, "%Y-%m-%d").date() - date.today()).days <= 7
+        except (ValueError, TypeError):
+            return False
+
     by_day = {}
     for j in db.reminders_between(conn, first.isoformat(), last.isoformat()):
-        by_day.setdefault(j["remind_on"], []).append(
-            {"kind": "remind", "title": j["title"], "link": j["link"], "done": j["done"]})
+        by_day.setdefault(j["remind_on"], []).append({
+            "kind": "remind", "label": j["title"], "job": j["title"],
+            "institution": j["institution"] or "", "researchers": j["researchers"] or "",
+            "href": "/starred#job-" + j["key"], "near": near(j["remind_on"]),
+            "done": j["done"]})
     for e in db.annotation_events_between(conn, first.isoformat(), last.isoformat()):
-        by_day.setdefault(e["on_date"], []).append(
-            {"kind": "event", "title": e["label"], "job": e["title"],
-             "link": e["link"], "done": e["done"]})
+        # 事件也可能挂在还没投递的收藏上，那就跳回收藏夹
+        page = "/applications" if e["applied_at"] else "/starred"
+        by_day.setdefault(e["on_date"], []).append({
+            "kind": "event", "label": e["label"], "job": e["title"],
+            "institution": e["institution"] or "", "researchers": e["researchers"] or "",
+            "href": page + "#job-" + e["key"], "near": near(e["on_date"]),
+            "done": e["done"]})
 
     start = first - timedelta(days=first.weekday())
     weeks, cur = [], start

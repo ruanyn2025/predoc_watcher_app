@@ -300,7 +300,7 @@ def js_strings(lang):
     """前端要用到的那部分，注入页面供 app.js 取用。"""
     i = _idx(lang)
     return {k: v[i] for k, v in S.items()
-            if k.startswith(("modal.", "toast.", "ann."))}
+            if k.startswith(("modal.", "toast.", "ann.", "card.", "cal."))}
 
 
 def lang_options(current):
