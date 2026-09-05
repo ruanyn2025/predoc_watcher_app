@@ -389,10 +389,10 @@ S.update({
     "toast.unapplied": ("已退回收藏夹", "已退回收藏夾", "Moved back to Starred",
                         "Remise dans les favoris", "Devuelta a Favoritos"),
 
-    "cal.legend_remind": ("收藏提醒", "收藏提醒", "Star reminders", "Rappels favoris",
-                          "Recordatorios"),
-    "cal.legend_event": ("申请事件", "申請事件", "Application dates",
-                         "Échéances candidature", "Fechas de candidatura"),
+    "cal.legend_remind": ("申请提醒", "申請提醒", "Application reminder",
+                          "Rappel de candidature", "Recordatorio de candidatura"),
+    "cal.legend_event": ("申请进程", "申請進程", "Application pipeline",
+                         "Étapes de candidature", "Etapas de candidatura"),
 })
 
 S.update({
