@@ -45,6 +45,24 @@
 {% block body %}{% endblock %}
 </main>
 
+<div class="modal" id="annModal" hidden>
+  <div class="modal-card">
+    <h3 id="anHeading"></h3>
+    <div id="anJob" class="modal-job"></div>
+    <label id="anLabelWrap"><span id="anLabelText"></span>
+      <input type="text" id="anLabel" autocomplete="off"></label>
+    <label id="anUrlWrap" hidden><span>{{ t('ann.url') }}</span>
+      <input type="url" id="anUrl" placeholder="{{ t('ann.url_ph') }}" autocomplete="off"></label>
+    <label id="anDateWrap" hidden><span>{{ t('ann.on_date') }}</span>
+      <input type="date" id="anDate"></label>
+    <div class="modal-actions">
+      <div class="spacer"></div>
+      <button class="btn ghost" onclick="closeAnn()">{{ t('ann.cancel') }}</button>
+      <button class="btn primary" onclick="saveAnn()">{{ t('ann.save') }}</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <div id="starModal" class="modal" hidden>
@@ -57,10 +75,6 @@
       <input type="date" id="smDate">
     </label>
     <div class="quick" id="smQuick"></div>
-    <label class="field">
-      <span>{{ t('modal.note') }}</span>
-      <input type="text" id="smNote" placeholder="{{ t('modal.note_ph') }}">
-    </label>
     <div class="modal-actions">
       <button class="btn danger" id="smUnstar" onclick="unstarFromModal()" hidden>{{ t('modal.unstar') }}</button>
       <div class="spacer"></div>

@@ -101,7 +101,6 @@ async function openPanel(btn) {
   document.getElementById('smDeadline').textContent =
     S('modal.deadline') + (s.parsed || s.deadline_raw || S('modal.none'));
   document.getElementById('smDate').value = s.remind_on;
-  document.getElementById('smNote').value = s.note || '';   // 编辑时带出原备注
   document.getElementById('smDate').dataset.basis = s.basis;
 
   // 快捷按钮：解析出日期时给"提前几天"，否则给几个常用间隔
@@ -163,7 +162,7 @@ async function confirmStar() {
     key: pendingKey,
     remind_on: dateEl.value,
     basis: dateEl.dataset.basis || 'manual',
-    note: document.getElementById('smNote').value,
+    note: '',                       // 备注改用气泡（annotations），这里不再写
   });
   if (!r.ok) { toast(r.error || S('toast.save_fail')); return; }
 
@@ -246,11 +245,11 @@ function openAnn(btn, kind) {
   annKind = kind;
   document.getElementById('anHeading').textContent = S('ann.add_' + kind);
   document.getElementById('anLabelText').textContent =
-    S(kind === 'event' ? 'ann.event_name' : kind === 'link' ? 'ann.link_label' : 'ann.tag');
+    S(kind === 'event' ? 'ann.event_name' : kind === 'link' ? 'ann.link_label' : 'ann.note');
   const label = document.getElementById('anLabel');
   label.value = '';
   label.placeholder = S('ann.' + (kind === 'event' ? 'event_ph'
-                                : kind === 'link' ? 'link_ph' : 'tag_ph'));
+                                : kind === 'link' ? 'link_ph' : 'note_ph'));
   document.getElementById('anUrlWrap').hidden = kind !== 'link';
   document.getElementById('anDateWrap').hidden = kind !== 'event';
   document.getElementById('anUrl').value = '';
@@ -272,7 +271,7 @@ async function saveAnn() {
   // 事件没有名字、链接没有地址，存下来就是一条看不懂的空记录
   if (annKind === 'event' && !label) { toast(S('ann.need_name')); return; }
   if (annKind === 'link' && !url) { toast(S('ann.need_url')); return; }
-  if (annKind === 'tag' && !label) { closeAnn(); return; }
+  if (annKind === 'note' && !label) { closeAnn(); return; }
 
   const r = await post('/api/annotation/add', {
     key: annKey, kind: annKind, label: label,

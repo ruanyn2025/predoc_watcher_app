@@ -299,7 +299,8 @@ def source_label(source_id, lang=DEFAULT_LANG):
 def js_strings(lang):
     """前端要用到的那部分，注入页面供 app.js 取用。"""
     i = _idx(lang)
-    return {k: v[i] for k, v in S.items() if k.startswith(("modal.", "toast."))}
+    return {k: v[i] for k, v in S.items()
+            if k.startswith(("modal.", "toast.", "ann."))}
 
 
 def lang_options(current):
@@ -349,19 +350,26 @@ S.update({
 
     # 三类标注
     "ann.event":      ("时间", "時間", "Dates", "Échéances", "Fechas"),
-    "ann.tag":        ("标签", "標籤", "Tags", "Étiquettes", "Etiquetas"),
+    "ann.note":       ("备注", "備註", "Notes", "Notes", "Notas"),
     "ann.link":       ("链接", "連結", "Links", "Liens", "Enlaces"),
     "ann.add_event":  ("加时间", "加時間", "Add date", "Ajouter une date", "Añadir fecha"),
-    "ann.add_tag":    ("加标签", "加標籤", "Add tag", "Ajouter une étiquette", "Añadir etiqueta"),
+    "ann.add_note":   ("加备注", "加備註", "Add note", "Ajouter une note", "Añadir nota"),
     "ann.add_link":   ("加链接", "加連結", "Add link", "Ajouter un lien", "Añadir enlace"),
     "ann.event_name": ("事件名", "事件名", "What is it?", "De quoi s'agit-il ?", "¿Qué es?"),
     "ann.event_ph":   ("比如：一面、code test 截止", "例如：一面、code test 截止",
                        "e.g. code test due, first interview",
                        "p. ex. test à rendre, premier entretien",
                        "p. ej. prueba a entregar, primera entrevista"),
-    "ann.tag_ph":     ("比如：需要推荐信", "例如：需要推薦信", "e.g. needs a reference letter",
-                       "p. ex. lettre de recommandation requise",
-                       "p. ej. requiere carta de recomendación"),
+    "ann.note_ph":    ("比如：需要两封推荐信", "例如：需要兩封推薦信",
+                       "e.g. needs two reference letters",
+                       "p. ex. deux lettres de recommandation requises",
+                       "p. ej. requiere dos cartas de recomendación"),
+    "ann.url":        ("链接地址", "連結地址", "URL", "URL", "URL"),
+    "ann.on_date":    ("日期", "日期", "Date", "Date", "Fecha"),
+    "ann.event_date_hint": ("日期和事件名都要填", "日期和事件名都要填",
+                            "Both the date and a name are needed",
+                            "La date et un nom sont requis",
+                            "Hacen falta la fecha y un nombre"),
     "ann.link_label": ("标题", "標題", "Label", "Intitulé", "Etiqueta"),
     "ann.link_ph":    ("比如：导师主页", "例如：指導教授首頁", "e.g. supervisor's homepage",
                        "p. ex. page du chercheur", "p. ej. web del investigador"),

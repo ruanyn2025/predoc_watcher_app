@@ -188,3 +188,15 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:-1px}
 .legend .sw{display:inline-block;width:10px;height:10px;border-radius:3px}
 .legend .sw.remind{background:var(--accent-soft);border:1px solid var(--bright)}
 .legend .sw.event{background:var(--bright)}
+
+/* 备注气泡：与事件、链接区分开 */
+.chip.note{background:var(--card);border-color:var(--line)}
+.chip.ev b{margin-right:4px}
+.modal-job{margin:-4px 0 10px;font-size:13px;color:var(--dim)}
+#annModal .modal-card{background:var(--card);border-radius:var(--radius);padding:18px 20px;
+  width:min(460px,92vw);display:flex;flex-direction:column;gap:12px;
+  box-shadow:0 18px 48px rgba(0,0,0,.2)}
+#annModal label{display:flex;flex-direction:column;gap:5px;font-size:13px;color:var(--dim)}
+#annModal input{padding:8px 10px;font:inherit;font-size:14px;color:var(--ink);
+  background:var(--bg);border:1px solid var(--line);border-radius:7px}
+#annModal input:focus{outline:none;border-color:var(--bright)}

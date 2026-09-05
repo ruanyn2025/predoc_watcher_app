@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_card.html" import card %}
+{% from "_anns.html" import anns with context %}
 {% block title %}{{ t('apps.title') }} · Predoc Watcher{% endblock %}
 {% block body %}
 
@@ -42,45 +42,7 @@
       </dl>
 
       {# 三类标注各占一行，空的也留着入口，否则第一次用的人不知道能加东西 #}
-      <div class="anns">
-        <div class="ann-row" data-kind="event">
-          <span class="ann-label">{{ t('ann.event') }}</span>
-          <span class="ann-items">
-            {% for e in a.get('event', []) %}
-            <span class="chip ev{{ ' done' if e.done }}">
-              <b>{{ fdate(e.on_date) }}</b> {{ e.label }}
-              <button class="x" onclick="delAnn({{ e.id }})" title="{{ t('ann.delete') }}">×</button>
-            </span>
-            {% else %}<span class="dim">{{ t('ann.none') }}</span>{% endfor %}
-          </span>
-          <button class="btn tiny" onclick="openAnn(this,'event')" data-key="{{ j.key }}">+ {{ t('ann.add_event') }}</button>
-        </div>
-
-        <div class="ann-row" data-kind="tag">
-          <span class="ann-label">{{ t('ann.tag') }}</span>
-          <span class="ann-items">
-            {% for e in a.get('tag', []) %}
-            <span class="chip tag">{{ e.label }}
-              <button class="x" onclick="delAnn({{ e.id }})" title="{{ t('ann.delete') }}">×</button>
-            </span>
-            {% else %}<span class="dim">{{ t('ann.none') }}</span>{% endfor %}
-          </span>
-          <button class="btn tiny" onclick="openAnn(this,'tag')" data-key="{{ j.key }}">+ {{ t('ann.add_tag') }}</button>
-        </div>
-
-        <div class="ann-row" data-kind="link">
-          <span class="ann-label">{{ t('ann.link') }}</span>
-          <span class="ann-items">
-            {% for e in a.get('link', []) %}
-            <span class="chip link">
-              <a href="{{ e.value }}" target="_blank" rel="noopener">{{ e.label or e.value }}</a>
-              <button class="x" onclick="delAnn({{ e.id }})" title="{{ t('ann.delete') }}">×</button>
-            </span>
-            {% else %}<span class="dim">{{ t('ann.none') }}</span>{% endfor %}
-          </span>
-          <button class="btn tiny" onclick="openAnn(this,'link')" data-key="{{ j.key }}">+ {{ t('ann.add_link') }}</button>
-        </div>
-      </div>
+      {{ anns(j.key, a) }}
     </article>
     {% endfor %}
   </div>

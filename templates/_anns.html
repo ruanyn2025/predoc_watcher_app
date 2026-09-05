@@ -1,0 +1,44 @@
+{# 三栏自由标注：时间 / 备注 / 链接。收藏页和申请追踪页共用。
+   空的时候也保留入口，否则第一次用的人不知道这里能加东西。 #}
+{% macro anns(key, a) %}
+<div class="anns">
+  <div class="ann-row">
+    <span class="ann-label">{{ t('ann.event') }}</span>
+    <span class="ann-items">
+      {% for e in a.get('event', []) %}
+      <span class="chip ev">
+        <b>{{ fdate(e.on_date) }}</b>{{ e.label }}
+        <button class="x" onclick="delAnn({{ e.id }})" title="{{ t('ann.delete') }}">×</button>
+      </span>
+      {% endfor %}
+    </span>
+    <button class="btn tiny" onclick="openAnn(this,'event')" data-key="{{ key }}">+ {{ t('ann.add_event') }}</button>
+  </div>
+
+  <div class="ann-row">
+    <span class="ann-label">{{ t('ann.note') }}</span>
+    <span class="ann-items">
+      {% for e in a.get('note', []) %}
+      <span class="chip note">{{ e.label }}
+        <button class="x" onclick="delAnn({{ e.id }})" title="{{ t('ann.delete') }}">×</button>
+      </span>
+      {% endfor %}
+    </span>
+    <button class="btn tiny" onclick="openAnn(this,'note')" data-key="{{ key }}">+ {{ t('ann.add_note') }}</button>
+  </div>
+
+  <div class="ann-row">
+    <span class="ann-label">{{ t('ann.link') }}</span>
+    <span class="ann-items">
+      {# target=_blank：桌面版的 pywebview 默认把外链交给系统浏览器打开 #}
+      {% for e in a.get('link', []) %}
+      <span class="chip link">
+        <a href="{{ e.value }}" target="_blank" rel="noopener" title="{{ e.value }}">{{ e.label or e.value }}</a>
+        <button class="x" onclick="delAnn({{ e.id }})" title="{{ t('ann.delete') }}">×</button>
+      </span>
+      {% endfor %}
+    </span>
+    <button class="btn tiny" onclick="openAnn(this,'link')" data-key="{{ key }}">+ {{ t('ann.add_link') }}</button>
+  </div>
+</div>
+{% endmacro %}

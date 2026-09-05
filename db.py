@@ -95,7 +95,26 @@ def init(conn):
         conn.execute("ALTER TABLE stars ADD COLUMN stage TEXT")
     # 这条索引必须等上面的 ALTER 跑完 —— 老库里 applied_at 那时才存在
     conn.execute("CREATE INDEX IF NOT EXISTS idx_stars_applied ON stars(applied_at)")
+    _migrate_notes(conn)
     conn.commit()
+
+
+def _migrate_notes(conn):
+    """把老的单条 stars.note 搬成一条 note 标注。
+
+    备注从"一个岗位一条"变成"可以有好多条气泡"，原来写过的字不能因此消失。
+    只搬一次：搬完把 stars.note 清空，重复运行不会生成重复气泡。
+    """
+    rows = conn.execute(
+        "SELECT key, note FROM stars WHERE note IS NOT NULL AND TRIM(note) <> ''").fetchall()
+    for r in rows:
+        conn.execute(
+            "INSERT INTO annotations(key, kind, label, value, on_date, created_at) "
+            "VALUES(?, 'note', ?, '', NULL, ?)",
+            (r["key"], r["note"].strip(), date.today().isoformat()))
+        conn.execute("UPDATE stars SET note = '' WHERE key = ?", (r["key"],))
+    if rows:
+        print("已把 %d 条旧备注迁成气泡" % len(rows))
 
 
 def get_meta(conn, k, default=None):
@@ -301,7 +320,7 @@ def count_applications(conn, exclude_closed=True):
 
 # ------------------------------------------------------- 自由标注
 
-ANNOTATION_KINDS = ("event", "tag", "link")
+ANNOTATION_KINDS = ("event", "note", "link")
 
 
 def add_annotation(conn, key, kind, label="", value="", on_date=None):
@@ -343,7 +362,7 @@ def annotations_for(conn, keys):
         keys))
     out = {}
     for r in rows:
-        out.setdefault(r["key"], {"event": [], "tag": [], "link": []})
+        out.setdefault(r["key"], {"event": [], "note": [], "link": []})
         out[r["key"]].setdefault(r["kind"], []).append(r)
     return out
 

@@ -1,4 +1,5 @@
-{% macro card(j, show_remind=false, show_apply=false) %}
+{% from "_anns.html" import anns with context %}
+{% macro card(j, show_remind=false, show_apply=false, a=none) %}
 <article class="card {{ 'closed' if j.status=='closed' }}">
   <div class="card-head">
     <h3><a href="{{ j.link }}" target="_blank" rel="noopener">{{ j.title or t('card.untitled') }}</a></h3>
@@ -41,11 +42,12 @@
     {% if j.researchers %}<dt>{{ t('card.researchers') }}</dt><dd>{{ j.researchers }}</dd>{% endif %}
     {% if j.fields %}<dt>{{ t('card.fields') }}</dt><dd>{{ j.fields }}</dd>{% endif %}
     {% if j.deadline_raw %}<dt>{{ t('card.deadline') }}</dt><dd class="mono">{{ j.deadline_raw }}</dd>{% endif %}
-    {% if j.note %}<dt>{{ t('card.note') }}</dt><dd class="mynote">{{ j.note }}</dd>{% endif %}
   </dl>
 
   {% if j.tags %}
   <div class="tags">{% for tg in j.tags %}<span class="tag">{{ tg }}</span>{% endfor %}</div>
   {% endif %}
+
+  {% if a is not none %}{{ anns(j.key, a) }}{% endif %}
 </article>
 {% endmacro %}

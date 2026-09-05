@@ -112,7 +112,9 @@ def page_starred(conn, query):
     jobs = db.starred_jobs(conn)
     return render("starred.html", conn=conn, jobs=jobs,
                   active=[j for j in jobs if not j["done"]],
-                  done=[j for j in jobs if j["done"]], nav="starred", lang=lang)
+                  done=[j for j in jobs if j["done"]],
+                  ann=db.annotations_for(conn, [j["key"] for j in jobs]),
+                  nav="starred", lang=lang)
 
 
 def page_applications(conn, query):
