@@ -21,6 +21,7 @@ from urllib.parse import parse_qs, unquote, urlparse
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
+import calcolors
 import db
 import deadlines
 import i18n
@@ -72,6 +73,11 @@ def render(name, **ctx):
     theme = ctx.pop("theme", None) or (current_theme(conn) if conn is not None else "system")
     ctx["theme"] = theme
     ctx["theme_options"] = i18n.theme_options(theme)
+    if conn is not None:
+        cols = calcolors.current(lambda k, d: db.get_meta(conn, k, d))
+        ctx["cal_colors"] = cols
+        ctx["cal_css"] = calcolors.css_vars(cols)
+        ctx["cal_presets"] = calcolors.PRESETS
     return env.get_template(name).render(**ctx).encode("utf-8")
 
 
@@ -280,6 +286,16 @@ def api_done(conn, payload):
     return {"ok": True}
 
 
+def api_cal_color(conn, payload):
+    kind = payload.get("kind")
+    if kind not in calcolors.DEFAULTS:
+        return {"ok": False, "error": "unknown kind"}
+    db.set_meta(conn, "cal_color_" + kind,
+                calcolors.parse(payload.get("color"), calcolors.DEFAULTS[kind]))
+    conn.commit()
+    return {"ok": True}
+
+
 def api_theme(conn, payload):
     db.set_meta(conn, "theme", i18n.normalise_theme(payload.get("theme")))
     conn.commit()
@@ -307,7 +323,7 @@ def api_refresh(conn, payload):
 
 PAGES = {"/": page_index, "/history": page_history, "/applications": page_applications,
          "/starred": page_starred, "/calendar": page_calendar}
-APIS = {"/api/lang": api_lang, "/api/theme": api_theme, "/api/suggest": api_suggest, "/api/star": api_star, "/api/unstar": api_unstar,
+APIS = {"/api/lang": api_lang, "/api/theme": api_theme, "/api/cal-color": api_cal_color, "/api/suggest": api_suggest, "/api/star": api_star, "/api/unstar": api_unstar,
         "/api/done": api_done,
         "/api/apply": api_apply, "/api/unapply": api_unapply, "/api/stage": api_stage,
         "/api/annotation/add": api_ann_add, "/api/annotation/update": api_ann_update,

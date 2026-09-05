@@ -6,6 +6,11 @@
 <title>{% block title %}Predoc Watcher{% endblock %}</title>
 <link rel="icon" href="/static/favicon.png">
 <link rel="stylesheet" href="/static/style.css">
+{% if cal_css %}<style>
+:root{ {{ cal_css.light }} }
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){ {{ cal_css.dark }} } }
+:root[data-theme="dark"]{ {{ cal_css.dark }} }
+</style>{% endif %}
 </head>
 <body>
 <header class="topbar">
@@ -76,7 +81,7 @@
     <div class="modal-actions">
       <div class="spacer"></div>
       <button class="btn ghost" onclick="closeAnn()">{{ t('ann.cancel') }}</button>
-      <button class="btn primary" onclick="saveAnn()">{{ t('ann.save') }}</button>
+      <button class="btn primary" id="anSave" onclick="saveAnn()">{{ t('ann.save') }}</button>
     </div>
   </div>
 </div>

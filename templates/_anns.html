@@ -6,9 +6,11 @@
     <span class="ann-label">{{ t('ann.event') }}</span>
     <span class="ann-items">
       {% for e in a.get('event', []) %}
-      <span class="chip ev">
+      <span class="chip ev" role="button" tabindex="0" onclick="openAnnEdit(this)"
+            title="{{ t('ann.edit_hint') }}" data-key="{{ key }}" data-kind="event"
+            data-id="{{ e.id }}" data-label="{{ e.label }}" data-date="{{ e.on_date }}">
         <b>{{ fdate(e.on_date) }}</b>{{ e.label }}
-        <button class="x" onclick="delAnn({{ e.id }})" title="{{ t('ann.delete') }}">×</button>
+        <button class="x" onclick="delAnn({{ e.id }}, event)" title="{{ t('ann.delete') }}">×</button>
       </span>
       {% endfor %}
     </span>
@@ -19,8 +21,10 @@
     <span class="ann-label">{{ t('ann.note') }}</span>
     <span class="ann-items">
       {% for e in a.get('note', []) %}
-      <span class="chip note">{{ e.label }}
-        <button class="x" onclick="delAnn({{ e.id }})" title="{{ t('ann.delete') }}">×</button>
+      <span class="chip note" role="button" tabindex="0" onclick="openAnnEdit(this)"
+            title="{{ t('ann.edit_hint') }}" data-key="{{ key }}" data-kind="note"
+            data-id="{{ e.id }}" data-label="{{ e.label }}">{{ e.label }}
+        <button class="x" onclick="delAnn({{ e.id }}, event)" title="{{ t('ann.delete') }}">×</button>
       </span>
       {% endfor %}
     </span>
@@ -32,9 +36,13 @@
     <span class="ann-items">
       {# target=_blank：桌面版的 pywebview 默认把外链交给系统浏览器打开 #}
       {% for e in a.get('link', []) %}
-      <span class="chip link">
+      {# 链接文字本身仍是超链接（点了开浏览器），旁边的铅笔才是编辑 #}
+      <span class="chip link" data-key="{{ key }}" data-kind="link"
+            data-id="{{ e.id }}" data-label="{{ e.label }}" data-value="{{ e.value }}">
         <a href="{{ e.value }}" target="_blank" rel="noopener" title="{{ e.value }}">{{ e.label or e.value }}</a>
-        <button class="x" onclick="delAnn({{ e.id }})" title="{{ t('ann.delete') }}">×</button>
+        <button class="x pen" onclick="openAnnEdit(this.parentElement)"
+                title="{{ t('ann.edit_hint') }}">✎</button>
+        <button class="x" onclick="delAnn({{ e.id }}, event)" title="{{ t('ann.delete') }}">×</button>
       </span>
       {% endfor %}
     </span>

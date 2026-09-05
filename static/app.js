@@ -260,29 +260,43 @@ async function setStage(sel) {
 
 /* ---------------- 三类标注 ---------------- */
 
-let annKey = null, annKind = null;
+let annKey = null, annKind = null, annId = null;
 
-function openAnn(btn, kind) {
+/* 新建：openAnn(按钮, 类型)。编辑已有的：openAnnEdit(气泡)。
+   两者共用同一个面板，靠 annId 是否为空区分要 add 还是 update。 */
+function openAnn(btn, kind, existing) {
   annKey = btn.dataset.key;
   annKind = kind;
-  document.getElementById('anHeading').textContent = S('ann.add_' + kind);
+  annId = existing ? Number(existing.id) : null;
+  document.getElementById('anHeading').textContent =
+    S(annId ? 'ann.edit_' + kind : 'ann.add_' + kind);
   document.getElementById('anLabelText').textContent =
     S(kind === 'event' ? 'ann.event_name' : kind === 'link' ? 'ann.link_label' : 'ann.note');
   const label = document.getElementById('anLabel');
-  label.value = '';
+  label.value = existing ? (existing.label || '') : '';
   label.placeholder = S('ann.' + (kind === 'event' ? 'event_ph'
                                 : kind === 'link' ? 'link_ph' : 'note_ph'));
   document.getElementById('anUrlWrap').hidden = kind !== 'link';
   document.getElementById('anDateWrap').hidden = kind !== 'event';
-  document.getElementById('anUrl').value = '';
-  document.getElementById('anDate').value = new Date().toISOString().slice(0, 10);
+  document.getElementById('anUrl').value = existing ? (existing.value || '') : '';
+  document.getElementById('anDate').value =
+    (existing && existing.date) || new Date().toISOString().slice(0, 10);
+  document.getElementById('anSave').textContent = S(annId ? 'ann.update' : 'ann.save');
   document.getElementById('annModal').hidden = false;
   label.focus();
 }
 
+/* 点气泡本体进入编辑；点气泡上的 × 是删除，那条路径自己 stopPropagation */
+function openAnnEdit(el) {
+  openAnn(el, el.dataset.kind, {
+    id: el.dataset.id, label: el.dataset.label,
+    value: el.dataset.value, date: el.dataset.date,
+  });
+}
+
 function closeAnn() {
   document.getElementById('annModal').hidden = true;
-  annKey = null; annKind = null;
+  annKey = null; annKind = null; annId = null;
 }
 
 async function saveAnn() {
@@ -295,17 +309,21 @@ async function saveAnn() {
   if (annKind === 'link' && !url) { toast(S('ann.need_url')); return; }
   if (annKind === 'note' && !label) { closeAnn(); return; }
 
-  const r = await post('/api/annotation/add', {
+  const body = {
     key: annKey, kind: annKind, label: label,
     value: annKind === 'link' ? url : '',
     on_date: annKind === 'event' ? on : null,
-  });
+  };
+  const r = annId
+    ? await post('/api/annotation/update', Object.assign({ id: annId }, body))
+    : await post('/api/annotation/add', body);
   if (!r.ok) { toast(r.error || S('toast.error')); return; }
   closeAnn();
   location.reload();
 }
 
-async function delAnn(id) {
+async function delAnn(id, ev) {
+  if (ev) ev.stopPropagation();          // 否则会顺带触发气泡的「进入编辑」
   const r = await post('/api/annotation/delete', { id: id });
   if (!r.ok) { toast(r.error || S('toast.error')); return; }
   location.reload();
@@ -354,11 +372,45 @@ async function delAnn(id) {
   }
 
   document.addEventListener('mouseover', e => {
-    const a = e.target.closest('.ev');
+    const a = e.target.closest('.cal-ev');
     if (a) show(a);
   });
   document.addEventListener('mouseout', e => {
-    if (e.target.closest('.ev')) pop.hidden = true;
+    if (e.target.closest('.cal-ev')) pop.hidden = true;
   });
   document.addEventListener('scroll', () => { pop.hidden = true; }, true);
 })();
+
+/* ---------------- 日历取色 ---------------- */
+
+let swatchKind = null;
+
+function openSwatch(e, kind) {
+  e.stopPropagation();
+  swatchKind = kind;
+  const pop = document.getElementById('swatchPop');
+  const cur = getComputedStyle(document.documentElement)
+                .getPropertyValue('--cal-' + kind + '-solid').trim();
+  document.getElementById('swHex').value = cur;
+  try { document.getElementById('swPicker').value = cur; } catch (_) {}
+  pop.hidden = false;
+  const r = e.currentTarget.getBoundingClientRect();
+  pop.style.left = Math.max(8, r.left) + 'px';
+  pop.style.top = Math.max(8, r.top - pop.getBoundingClientRect().height - 8) + 'px';
+}
+
+function closeSwatch() {
+  const pop = document.getElementById('swatchPop');
+  if (pop && !pop.hidden) { pop.hidden = true; swatchKind = null; }
+}
+
+async function pickSwatch(hex) {
+  if (!swatchKind) return;
+  const r = await post('/api/cal-color', { kind: swatchKind, color: hex });
+  if (!r.ok) { toast(r.error || S('toast.error')); return; }
+  location.reload();
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('#swatchPop')) closeSwatch();
+});

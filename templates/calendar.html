@@ -22,7 +22,7 @@
       <div class="cal-cell {{ 'out' if not cell.in_month }} {{ 'today' if cell.date == today }}">
         <div class="dnum">{{ cell.date.day }}</div>
         {% for j in cell.jobs %}
-        <a class="ev {{ j.kind }}{{ ' near' if j.near }}{{ ' done' if j.done }}"
+        <a class="cal-ev {{ j.kind }}{{ ' near' if j.near }}{{ ' done' if j.done }}"
            href="{{ j.href }}"
            data-job="{{ j.job }}" data-inst="{{ j.institution }}"
            data-res="{{ j.researchers }}" data-label="{{ j.label }}"
@@ -35,8 +35,25 @@
     {% endfor %}
   </div>
   <p class="dim">
-    <span class="legend"><i class="sw remind"></i>{{ t('cal.legend_remind') }}</span>
-    <span class="legend"><i class="sw event"></i>{{ t('cal.legend_event') }}</span>
+    {% for kind, label in [('remind', t('cal.legend_remind')), ('event', t('cal.legend_event'))] %}
+    <span class="legend">
+      <button class="sw {{ kind }}" onclick="openSwatch(event,'{{ kind }}')"
+              title="{{ t('cal.pick_color') }}" aria-label="{{ t('cal.pick_color') }}"></button>{{ label }}
+    </span>
+    {% endfor %}
+    <div class="swatchpop" id="swatchPop" hidden>
+      <div class="sw-grid">
+        {% for name, hex in cal_presets %}
+        <button class="sw-dot" style="background:{{ hex }}" data-hex="{{ hex }}"
+                onclick="pickSwatch('{{ hex }}')" title="{{ t('color.' ~ name) }}"></button>
+        {% endfor %}
+      </div>
+      <div class="sw-custom">
+        <input type="color" id="swPicker" oninput="document.getElementById('swHex').value=this.value">
+        <input type="text" id="swHex" placeholder="#2563eb" spellcheck="false" maxlength="7">
+        <button class="btn tiny" onclick="pickSwatch(document.getElementById('swHex').value)">{{ t('ann.update') }}</button>
+      </div>
+    </div>
     <br>{{ t('cal.note') }}<a href="/starred">{{ t('nav.starred') }}</a>{{ t('cal.note_tail') }}</p>
 </section>
 {% endblock %}
