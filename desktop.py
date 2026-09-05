@@ -227,9 +227,11 @@ def main():
     shell.build_tray()
     threading.Thread(target=shell.fetch_loop, daemon=True).start()
 
+    # text_select 默认是 False —— pywebview 会注入 CSS 把整页的文本选中禁掉，
+    # 于是导师名字、机构名这些都没法用光标划选复制。这是个网页界面，必须能选。
     shell.window = webview.create_window(
         APP_NAME, shell.url, width=1180, height=860, min_size=(720, 560),
-        hidden=args.minimized,
+        hidden=args.minimized, text_select=True,
     )
     shell.window.events.closing += shell.on_closing
 
