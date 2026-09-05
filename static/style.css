@@ -1,19 +1,43 @@
-/* 配色取自应用图标：橙 + 白 + 黑。底面是淡橙而非纯白。
-   --accent 是能安全承载文字的深橙（白底上约 5:1 对比度）；
-   --bright 是图标那支亮橙，只用来填色，其上的文字一律用近黑的 --on-bright，
-   亮橙配白字对比度不够，配黑字反而有 10:1，也更像图标本身。 */
+/* 配色取自应用图标：橙 + 白 + 黑。
+   底面是中性的白/黑，橙只留给需要被看见的小元素 —— 数字气泡、星标、主按钮、
+   当前页下划线。大面积铺橙会把这些强调点淹掉，反而看不出重点在哪。
+
+   --accent 是能安全承载文字的深橙（白底约 5:1）；--bright 是图标那支亮橙，
+   只用来填色，其上的文字一律压近黑的 --on-bright —— 亮橙配白字对比度不够，
+   配黑字反而有 10:1，也更像图标本身。
+
+   三态主题：不带 data-theme 时跟随系统；带上就锁定，两个方向都能压过系统偏好。 */
 [hidden]{display:none !important}
 
 :root{
-  --bg:#fbf2e6; --card:#fffefb; --ink:#1f1c18; --dim:#8a7f72; --line:#eddfcc;
-  --accent:#b05c07; --bright:#ea7a10; --on-bright:#1f1c18; --accent-soft:#fdf0dc;
-  --gone:#a89e94; --radius:10px;
+  color-scheme:light;
+  --bg:#ffffff; --card:#ffffff; --ink:#17171a; --dim:#71717a; --line:#e4e4e8;
+  --accent:#b05c07; --bright:#ea7a10; --on-bright:#1f1c18; --accent-soft:#fff2e2;
+  --gone:#a1a1aa; --radius:10px;
+  --cal-remind:#8a6d00; --cal-remind-soft:#fbf0c4; --cal-remind-solid:#e3b505;
+  --cal-event:#1d4ed8;  --cal-event-soft:#dbe6fe;  --cal-event-solid:#2563eb;
 }
+
+/* 深色的一整套值，两处引用（系统深色、手动选深色），靠这个 mixin 式的重复保持一致 */
 @media (prefers-color-scheme:dark){
-  :root{ --bg:#15130f; --card:#1e1b17; --ink:#f2ece3; --dim:#9a8f80; --line:#2d2823;
-    --accent:#ef9a3a; --bright:#ea7a10; --on-bright:#1f1c18; --accent-soft:#2a2016;
-    --gone:#6f665c; }
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0a0a0b; --card:#151518; --ink:#ededf0; --dim:#8b8b93; --line:#26262b;
+    --accent:#f0932c; --bright:#ea7a10; --on-bright:#1f1c18; --accent-soft:#2a1c0c;
+    --gone:#63636b;
+    --cal-remind:#f0cf5a; --cal-remind-soft:#3a3010; --cal-remind-solid:#c9a021;
+    --cal-event:#9dbcfb;  --cal-event-soft:#16244a;  --cal-event-solid:#3b6fe0;
+  }
 }
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0a0a0b; --card:#151518; --ink:#ededf0; --dim:#8b8b93; --line:#26262b;
+  --accent:#f0932c; --bright:#ea7a10; --on-bright:#1f1c18; --accent-soft:#2a1c0c;
+  --gone:#63636b;
+  --cal-remind:#f0cf5a; --cal-remind-soft:#3a3010; --cal-remind-solid:#c9a021;
+  --cal-event:#9dbcfb;  --cal-event-soft:#16244a;  --cal-event-solid:#3b6fe0;
+}
+
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);
   font:15px/1.6 -apple-system,"Segoe UI","Microsoft YaHei",system-ui,sans-serif}
@@ -203,17 +227,7 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:-1px}
   background:var(--bg);border:1px solid var(--line);border-radius:7px}
 #annModal input:focus{outline:none;border-color:var(--bright)}
 
-/* ---- 日历：两类标记各自一种色相，与浅橙界面拉开 ---- */
-:root{
-  --cal-remind:#8a6d00; --cal-remind-soft:#fbf0c4; --cal-remind-solid:#e3b505;
-  --cal-event:#1d4ed8;  --cal-event-soft:#dbe6fe;  --cal-event-solid:#2563eb;
-}
-@media (prefers-color-scheme:dark){
-  :root{
-    --cal-remind:#f0cf5a; --cal-remind-soft:#3a3010; --cal-remind-solid:#c9a021;
-    --cal-event:#9dbcfb;  --cal-event-soft:#16244a;  --cal-event-solid:#3b6fe0;
-  }
-}
+/* ---- 日历：两类标记各自一种色相 ---- */
 /* 远的：浅底描边。近的（7 天内）：实心，一眼看出紧迫 */
 .ev.remind{background:var(--cal-remind-soft);color:var(--cal-remind);
   border-left-color:var(--cal-remind-solid)}

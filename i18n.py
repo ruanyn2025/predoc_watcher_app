@@ -394,3 +394,22 @@ S.update({
     "cal.legend_event": ("申请事件", "申請事件", "Application dates",
                          "Échéances candidature", "Fechas de candidatura"),
 })
+
+S.update({
+    # ---- 主题 ----------------------------------------------------------
+    "theme.label":   ("主题", "主題", "Theme", "Thème", "Tema"),
+    "theme.system":  ("跟随系统", "跟隨系統", "System", "Système", "Sistema"),
+    "theme.light":   ("浅色", "淺色", "Light", "Clair", "Claro"),
+    "theme.dark":    ("深色", "深色", "Dark", "Sombre", "Oscuro"),
+})
+
+THEMES = ("system", "light", "dark")
+
+
+def normalise_theme(theme):
+    return theme if theme in THEMES else "system"
+
+
+def theme_options(current):
+    cur = normalise_theme(current)
+    return [(code, code == cur) for code in THEMES]

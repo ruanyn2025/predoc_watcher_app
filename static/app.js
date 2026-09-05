@@ -10,9 +10,31 @@ function S(key, vars) {
 
 function toggleLangMenu(e) {
   e.stopPropagation();                       // 否则会立刻被下面那个"点别处就关"接住
+  closeThemeMenu();
   const m = document.getElementById('langMenu');
   m.hidden = !m.hidden;
   e.currentTarget.setAttribute('aria-expanded', String(!m.hidden));
+}
+
+function toggleThemeMenu(e) {
+  e.stopPropagation();
+  closeLangMenu();
+  const m = document.getElementById('themeMenu');
+  m.hidden = !m.hidden;
+  e.currentTarget.setAttribute('aria-expanded', String(!m.hidden));
+}
+
+function closeThemeMenu() {
+  const m = document.getElementById('themeMenu');
+  if (m && !m.hidden) {
+    m.hidden = true;
+    document.querySelector('.themebox .globe').setAttribute('aria-expanded', 'false');
+  }
+}
+
+async function pickTheme(code) {
+  await post('/api/theme', { theme: code });
+  location.reload();
 }
 
 function closeLangMenu() {
@@ -29,7 +51,7 @@ async function pickLang(code) {
   location.reload();
 }
 
-document.addEventListener('click', closeLangMenu);
+document.addEventListener('click', () => { closeLangMenu(); closeThemeMenu(); });
 
 function toast(msg) {
   const t = document.getElementById('toast');

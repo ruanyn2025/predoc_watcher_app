@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="{{ 'zh-CN' if lang == 'zh' else 'en' }}">
+<html lang="{{ 'zh-CN' if lang == 'zh' else 'en' }}"{% if theme != 'system' %} data-theme="{{ theme }}"{% endif %}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -21,6 +21,24 @@
     <div class="spacer"></div>
     <span class="counts">{{ t('nav.counts', open=stats.open, closed=stats.closed) }}</span>
     <button class="btn ghost" onclick="refreshData(this)">{{ t('nav.refresh') }}</button>
+    <div class="langbox themebox">
+      <button class="globe" onclick="toggleThemeMenu(event)" title="{{ t('theme.label') }}"
+              aria-label="{{ t('theme.label') }}" aria-haspopup="true" aria-expanded="false">
+        {# 半明半暗的圆：一个图标同时表达浅色与深色，不用随状态换图 #}
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.7"/>
+          <path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/>
+        </svg>
+      </button>
+      <div class="langmenu" id="themeMenu" hidden>
+        {% for code, is_current in theme_options %}
+        <button class="langitem {{ 'on' if is_current }}" onclick="pickTheme('{{ code }}')">
+          <span class="tick">{{ '✓' if is_current else '' }}</span>{{ t('theme.' ~ code) }}
+        </button>
+        {% endfor %}
+      </div>
+    </div>
+
     <div class="langbox">
       <button class="globe" onclick="toggleLangMenu(event)" title="{{ t('nav.language') }}"
               aria-label="{{ t('nav.language') }}" aria-haspopup="true" aria-expanded="false">

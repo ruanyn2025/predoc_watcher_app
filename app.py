@@ -69,11 +69,18 @@ def render(name, **ctx):
     ctx["source_label"] = lambda sid: i18n.source_label(sid, lang)
     ctx["js_strings"] = json.dumps(i18n.js_strings(lang), ensure_ascii=False)
     ctx["lang_options"] = i18n.lang_options(lang)
+    theme = ctx.pop("theme", None) or (current_theme(conn) if conn is not None else "system")
+    ctx["theme"] = theme
+    ctx["theme_options"] = i18n.theme_options(theme)
     return env.get_template(name).render(**ctx).encode("utf-8")
 
 
 def current_lang(conn):
     return i18n.normalise(db.get_meta(conn, "lang", i18n.DEFAULT_LANG))
+
+
+def current_theme(conn):
+    return i18n.normalise_theme(db.get_meta(conn, "theme", "system"))
 
 
 def page_index(conn, query):
@@ -273,6 +280,12 @@ def api_done(conn, payload):
     return {"ok": True}
 
 
+def api_theme(conn, payload):
+    db.set_meta(conn, "theme", i18n.normalise_theme(payload.get("theme")))
+    conn.commit()
+    return {"ok": True}
+
+
 def api_lang(conn, payload):
     """切换界面语言。存进 meta，所以下次打开还是这门语言。"""
     db.set_meta(conn, "lang", i18n.normalise(payload.get("lang")))
@@ -294,7 +307,7 @@ def api_refresh(conn, payload):
 
 PAGES = {"/": page_index, "/history": page_history, "/applications": page_applications,
          "/starred": page_starred, "/calendar": page_calendar}
-APIS = {"/api/lang": api_lang, "/api/suggest": api_suggest, "/api/star": api_star, "/api/unstar": api_unstar,
+APIS = {"/api/lang": api_lang, "/api/theme": api_theme, "/api/suggest": api_suggest, "/api/star": api_star, "/api/unstar": api_unstar,
         "/api/done": api_done,
         "/api/apply": api_apply, "/api/unapply": api_unapply, "/api/stage": api_stage,
         "/api/annotation/add": api_ann_add, "/api/annotation/update": api_ann_update,
