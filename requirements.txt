@@ -1,13 +1,19 @@
-# 网页界面本身（app.py）只需要 jinja2，其余用标准库。
+# Keep this file ASCII-only. Without a BOM, pip decodes requirements files
+# using the system locale encoding, so non-ASCII comments break the install
+# on any machine whose locale is not UTF-8 (e.g. cp936 on Chinese Windows).
+
+# Web interface (app.py). Everything else it needs is in the standard library.
 jinja2>=3.0
 
-# 自带抓取，不依赖邮件推送版。
+# Fetching and parsing the job boards.
+# certifi is used directly, to supply the intermediate certificate
+# predoc.org omits from its chain.
 requests>=2.25
 beautifulsoup4>=4.9
-certifi          # fetch.py 直接用它来补 predoc.org 缺失的中间证书
+certifi
 
-# 桌面版（desktop.py）：窗口 + 系统托盘 + 图标生成。
-# 只跑网页版的话这三个不装也行。
+# Desktop shell (desktop.py): window, system tray, icon generation.
+# Not needed if you only run the web version.
 pywebview>=4.0
 pystray>=0.19
 pillow>=9.0
