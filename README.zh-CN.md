@@ -6,6 +6,10 @@
 
 自带抓取和本地数据库，装完即用。不需要 API key、邮箱或任何账号。
 
+![Predoc Watcher](docs/demo.gif)
+
+**[在浏览器里直接试用](https://claude.ai/code/artifact/4c78e2a9-6060-4889-bd3e-9f78ede18096)** —— 示例数据的在线 Demo，不用安装。
+
 | 来源 | 页面 |
 |---|---|
 | predoc.org | <https://www.predoc.org/opportunities> |

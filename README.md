@@ -7,6 +7,10 @@ set reminders, and track your applications.
 
 It fetches the boards itself and keeps a local database. No API key, no mailbox, no account.
 
+![Predoc Watcher](docs/demo.gif)
+
+**[Try it in your browser](https://claude.ai/code/artifact/4c78e2a9-6060-4889-bd3e-9f78ede18096)** — a live demo with sample data. Nothing to install.
+
 | Source | Page |
 |---|---|
 | predoc.org | <https://www.predoc.org/opportunities> |
