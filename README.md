@@ -213,8 +213,6 @@ python_path.txt       your interpreter path (optional)
 
 ## Changelog
 
-Newest first. Only changes that affect how the app behaves.
-
 ### 2026-09-10
 
 - Added a demo GIF and a clickable live demo to the README.
