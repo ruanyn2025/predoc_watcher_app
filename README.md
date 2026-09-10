@@ -211,6 +211,14 @@ python_path.txt       your interpreter path (optional)
 - Everything found on the first run is recorded as pre-existing and does not count as new.
 - The window and tray have only been tested on Windows.
 
+## Changelog
+
+Newest first. Only changes that affect how the app behaves.
+
+### 2026-09-10
+
+- Added a demo GIF and a clickable live demo to the README.
+
 ## License
 
 MIT, see [LICENSE](LICENSE).
