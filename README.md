@@ -213,6 +213,10 @@ python_path.txt       your interpreter path (optional)
 
 ## Changelog
 
+### 2026-09-11
+
+- Fixed: a posting marked as applied stayed in Due soon and on the calendar.
+
 ### 2026-09-10
 
 - Added a demo GIF and a clickable live demo to the README.

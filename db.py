@@ -232,10 +232,17 @@ def starred_jobs(conn, include_done=True):
 
 
 def reminders_between(conn, start, end):
+    """收藏提醒：**只含尚未投递的**。
+
+    收藏时设的提醒意思是「记得在这天之前投」，投完就没有意义了。
+    投递之后该看的是申请追踪页上自己记的时间点（笔试、面试），
+    那些走 annotation_events_between()。
+    """
     return _rows(conn.execute(
         "SELECT j.*, 1 AS starred, s.remind_on, s.remind_basis, s.note, s.done "
         "FROM stars s JOIN jobs j ON j.key = s.key "
-        "WHERE s.remind_on IS NOT NULL AND s.remind_on >= ? AND s.remind_on <= ? "
+        "WHERE s.applied_at IS NULL "
+        "  AND s.remind_on IS NOT NULL AND s.remind_on >= ? AND s.remind_on <= ? "
         "ORDER BY s.remind_on ASC", (start, end)))
 
 

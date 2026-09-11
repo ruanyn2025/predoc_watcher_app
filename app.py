@@ -99,7 +99,7 @@ def page_index(conn, query):
         groups[-1]["jobs"].append(job)
 
     horizon = (date.today() + timedelta(days=7)).isoformat()
-    upcoming = [j for j in db.reminders_between(conn, "1970-01-01", horizon) if not j["done"]]
+    upcoming = db.reminders_between(conn, "1970-01-01", horizon)
 
     return render("index.html", conn=conn, groups=groups, fresh_count=len(fresh),
                   upcoming=upcoming,
