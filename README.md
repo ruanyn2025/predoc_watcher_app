@@ -213,6 +213,10 @@ python_path.txt       your interpreter path (optional)
 
 ## Changelog
 
+### 2026-09-12
+
+- Applications now show when a posting was found, and mark it if it has been delisted.
+
 ### 2026-09-11
 
 - Fixed: a posting marked as applied stayed in Due soon and on the calendar.

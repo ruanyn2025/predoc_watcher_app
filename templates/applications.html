@@ -28,12 +28,17 @@
       </div>
 
       <div class="badges">
-        <span class="badge src">{{ source_label(j.source) }}</span>
+        <span class="badge src-{{ j.source }}">{{ source_label(j.source) }}</span>
+        {# 抓取日期在这页同样要有：投递之后回头看，「这条挂了多久我才投的」
+           和「投出去多久了」是两个不同的问题，都需要。 #}
+        <span class="badge date" title="{{ t('card.seen_hint') }}">{{ t('card.seen', date=j.first_seen) }}</span>
         <span class="badge date">{{ t('apps.applied_on', date=fdate(j.applied_at)) }}</span>
         {% set d = j.applied_at|days_since %}
         {% if d is not none %}
         <span class="badge date">{{ t('apps.today') if d == 0 else t('apps.days_since', n=d) }}</span>
         {% endif %}
+        {# 投出去之后岗位被撤下来，是该知道的事 #}
+        {% if j.status == 'closed' %}<span class="badge gone">{{ t('card.closed') }}</span>{% endif %}
       </div>
 
       <dl class="meta">
