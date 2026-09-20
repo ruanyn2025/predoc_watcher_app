@@ -128,7 +128,7 @@ button on each card changes the reminder date and the note. Pressing a lit star 
 Dates, notes and links are available on the Starred page too, for postings you have not applied to
 yet. Moving an application back to Starred keeps everything you wrote.
 
-**Calendar** — a month view of every reminder and application date. Dates within 7 days are shown
+**Calendar** — a month view of three kinds of mark: reminders on starred postings, the dates you recorded on an application, and the day you applied. Dates within 7 days are shown
 solid, later ones tinted. Hovering a mark shows the institution and researchers; clicking it jumps
 back to the card on Starred or Applications.
 
@@ -212,6 +212,10 @@ python_path.txt       your interpreter path (optional)
 - The window and tray have only been tested on Windows.
 
 ## Changelog
+
+### 2026-09-20
+
+- The calendar now marks the day you applied to each posting.
 
 ### 2026-09-12
 

@@ -20,7 +20,7 @@ PRESETS = [
     ("purple", "#7048e8"),
 ]
 
-DEFAULTS = {"remind": "#e3b505", "event": "#2563eb"}
+DEFAULTS = {"remind": "#e3b505", "event": "#2563eb", "applied": "#2f9e44"}
 
 LIGHT_SURFACE = (255, 255, 255)
 DARK_SURFACE = (21, 21, 24)

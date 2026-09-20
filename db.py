@@ -374,6 +374,16 @@ def annotations_for(conn, keys):
     return out
 
 
+def applied_between(conn, start, end):
+    """投递日期。这是已经发生的事，不是待办 —— 日历上据此不做紧迫度渲染。"""
+    return _rows(conn.execute(
+        "SELECT j.*, s.applied_at, "
+        "       COALESCE(NULLIF(s.stage, ''), 'applied') AS stage "
+        "FROM stars s JOIN jobs j ON j.key = s.key "
+        "WHERE s.applied_at IS NOT NULL AND s.applied_at >= ? AND s.applied_at <= ? "
+        "ORDER BY s.applied_at ASC", (start, end)))
+
+
 def annotation_events_between(conn, start, end):
     """日历用：申请事件，带上所属岗位的标题。"""
     return _rows(conn.execute(

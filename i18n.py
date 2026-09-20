@@ -408,6 +408,8 @@ S.update({
                           "Rappel de candidature", "Recordatorio de candidatura"),
     "cal.legend_event": ("申请进程", "申請進程", "Application pipeline",
                          "Étapes de candidature", "Etapas de candidatura"),
+    "cal.legend_applied": ("已投递", "已投遞", "Applied",
+                           "Candidature envoyée", "Candidatura enviada"),
 })
 
 S.update({

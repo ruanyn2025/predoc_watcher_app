@@ -182,6 +182,14 @@ def page_calendar(conn, query):
             "href": page + "#job-" + e["key"], "near": near(e["on_date"]),
             "done": e["done"]})
 
+    # 投递日期。这是已发生的事，所以 near 恒为 False —— 它不该被渲染成
+    # "快到期了"的紧迫样式，日历上看到它只是回顾"我那天投了"。
+    for a in db.applied_between(conn, first.isoformat(), last.isoformat()):
+        by_day.setdefault(a["applied_at"], []).append({
+            "kind": "applied", "label": a["title"], "job": a["title"],
+            "institution": a["institution"] or "", "researchers": a["researchers"] or "",
+            "href": "/applications#job-" + a["key"], "near": False, "done": False})
+
     start = first - timedelta(days=first.weekday())
     weeks, cur = [], start
     while True:

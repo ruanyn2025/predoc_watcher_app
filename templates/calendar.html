@@ -26,7 +26,7 @@
            href="{{ j.href }}"
            data-job="{{ j.job }}" data-inst="{{ j.institution }}"
            data-res="{{ j.researchers }}" data-label="{{ j.label }}"
-           data-kind="{{ t('cal.legend_event') if j.kind == 'event' else t('cal.legend_remind') }}"
+           data-kind="{{ {'event': t('cal.legend_event'), 'applied': t('cal.legend_applied')}.get(j.kind, t('cal.legend_remind')) }}"
         >{{ j.label }}</a>
         {% endfor %}
       </div>
@@ -35,7 +35,7 @@
     {% endfor %}
   </div>
   <p class="dim">
-    {% for kind, label in [('remind', t('cal.legend_remind')), ('event', t('cal.legend_event'))] %}
+    {% for kind, label in [('remind', t('cal.legend_remind')), ('event', t('cal.legend_event')), ('applied', t('cal.legend_applied'))] %}
     <span class="legend">
       <button class="sw {{ kind }}" onclick="openSwatch(event,'{{ kind }}')"
               title="{{ t('cal.pick_color') }}" aria-label="{{ t('cal.pick_color') }}"></button>{{ label }}

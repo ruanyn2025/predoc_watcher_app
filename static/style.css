@@ -275,3 +275,10 @@ input:focus,select:focus{outline:2px solid var(--accent);outline-offset:-1px}
 .sw-custom input[type=text]{width:88px;padding:4px 6px;font:inherit;font-size:12.5px;
   font-family:ui-monospace,Consolas,monospace;color:var(--ink);
   background:var(--bg);border:1px solid var(--line);border-radius:5px}
+
+/* 投递日期：已经发生的事，没有待办属性。所以只描边不填色，
+   也不参与 .near 的实心强调 —— 视觉上要比另外两类更安静。 */
+.cal-ev.applied{background:transparent;color:var(--cal-applied);
+  border-left-color:var(--cal-applied-solid);
+  box-shadow:inset 0 0 0 1px var(--cal-applied-soft)}
+.legend .sw.applied{background:var(--cal-applied-solid)}
