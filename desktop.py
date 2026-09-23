@@ -182,6 +182,36 @@ def set_window_icon():
         pass
 
 
+def enable_context_menu():
+    """把右键菜单打开 —— 「复制」在那里面。
+
+    pywebview 给 WebView2 的设置是 AreDefaultContextMenusEnabled = debug，
+    非调试模式下整页右键没有任何反应。之前加的 text_select=True 只解决了
+    拖选，选中之后右键仍然是死的；对一个用来抄导师名字、机构名的界面来说，
+    只能拖选不能右键复制是半个功能。
+
+    开发者工具由另一个开关（AreDevToolsEnabled）管，这里不动它，所以菜单
+    里不会出现「检查」。
+
+    改的是 pywebview 内部的方法，所以整段都包在 try 里：万一它换了实现，
+    最坏也只是回到现在这样没有右键菜单，不影响启动。
+    """
+    try:
+        from webview.platforms import edgechromium
+    except Exception:                                     # noqa: BLE001
+        return                                            # 不是 WebView2 后端
+    original = edgechromium.EdgeChrome.on_webview_ready
+
+    def with_context_menu(self, sender, args):
+        original(self, sender, args)
+        try:
+            sender.CoreWebView2.Settings.AreDefaultContextMenusEnabled = True
+        except Exception:                                 # noqa: BLE001
+            pass
+
+    edgechromium.EdgeChrome.on_webview_ready = with_context_menu
+
+
 def main():
     ap = argparse.ArgumentParser(description="%s 桌面版" % APP_NAME)
     ap.add_argument("--port", type=int, default=DEFAULT_PORT)
@@ -221,6 +251,7 @@ def main():
             print("启动检查失败（不影响浏览已有数据）：%s" % exc)
     conn.close()
 
+    enable_context_menu()
     shell = Shell(args.port, args.interval)
     shell.register_show_endpoint()
     shell.start_server()

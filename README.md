@@ -213,6 +213,10 @@ python_path.txt       your interpreter path (optional)
 
 ## Changelog
 
+### 2026-09-23
+
+- Right-click to copy now works inside the window.
+
 ### 2026-09-20
 
 - The calendar now marks the day you applied to each posting.
