@@ -215,7 +215,6 @@ python_path.txt       your interpreter path (optional)
 
 ### 2026-09-23
 
-- Right-click to copy now works inside the window.
 - Application cards show research fields and the deadline again.
 
 ### 2026-09-20
