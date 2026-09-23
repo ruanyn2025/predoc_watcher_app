@@ -51,10 +51,6 @@
         {% if j.deadline_raw %}<dt>{{ t('card.deadline') }}</dt><dd class="mono">{{ j.deadline_raw }}</dd>{% endif %}
       </dl>
 
-      {% if j.tags %}
-      <div class="tags">{% for tg in j.tags %}<span class="tag">{{ tg }}</span>{% endfor %}</div>
-      {% endif %}
-
       {# 三类标注各占一行，空的也留着入口，否则第一次用的人不知道能加东西 #}
       {{ anns(j.key, a) }}
     </article>
