@@ -114,7 +114,9 @@ researchers, institutions and titles at once; several space-separated words must
 `labor harvard` finds postings matching both the field and the institution. You can also filter by
 source and by whether a posting is still open.
 
-**Starred** — press the star to save a posting; the list is sorted by reminder date. The **Edit**
+**Starred** — press the star to save a posting; reminders due today or later come first, followed by
+postings without a reminder, then overdue reminders. Each group is sorted by reminder date;
+overdue postings stay starred. The **Edit**
 button on each card changes the reminder date and the note. Pressing a lit star unstars.
 
 **Applications** — pressing "Applied" on a starred posting moves it here. For each one you can:
@@ -212,6 +214,10 @@ python_path.txt       your interpreter path (optional)
 - The window and tray have only been tested on Windows.
 
 ## Changelog
+
+### 2026-09-27
+
+- Overdue reminders move to the bottom of Starred without removing their stars.
 
 ### 2026-09-23
 

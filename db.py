@@ -228,7 +228,9 @@ def starred_jobs(conn, include_done=True):
         "SELECT j.*, 1 AS starred, s.remind_on, s.note, s.done, s.starred_at "
         "FROM stars s JOIN jobs j ON j.key = s.key "
         "WHERE s.applied_at IS NULL "
-        "ORDER BY s.remind_on IS NULL, s.remind_on, j.title"))
+        "ORDER BY CASE WHEN s.remind_on < ? THEN 2 "
+        "WHEN s.remind_on IS NULL THEN 1 ELSE 0 END, s.remind_on, j.title",
+        (date.today().isoformat(),)))
 
 
 def reminders_between(conn, start, end):
