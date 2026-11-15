@@ -134,6 +134,15 @@ yet. Moving an application back to Starred keeps everything you wrote.
 solid, later ones tinted. Hovering a mark shows the institution and researchers; clicking it jumps
 back to the card on Starred or Applications.
 
+## Add your own postings
+
+Click **Add posting** at the top. Enter a title and, optionally, the institution, researchers,
+fields, deadline information and posting URL. Saved postings appear in History under the **Manual**
+source filter and support stars, reminders and application tracking. Refreshing does not change them.
+
+The **Delete** button on a manual card asks for confirmation, then permanently removes the posting,
+its star, application record and all annotations.
+
 ## The reminder date when you star something
 
 Starring opens a panel asking you to confirm a reminder date. This is because the deadline field on
@@ -214,6 +223,10 @@ python_path.txt       your interpreter path (optional)
 - The window and tray have only been tested on Windows.
 
 ## Changelog
+
+### 2026-11-15
+
+- Add and delete manual postings, with stars, reminders and application tracking.
 
 ### 2026-09-27
 

@@ -24,6 +24,7 @@
       <a href="/calendar" class="{{ 'on' if nav=='calendar' }}">{{ t('nav.calendar') }}</a>
     </nav>
     <div class="spacer"></div>
+    <a class="btn ghost" href="/manual">{{ t('manual.add') }}</a>
     <span class="counts">{{ t('nav.counts', open=stats.open, closed=stats.closed) }}</span>
     <button class="btn ghost" onclick="refreshData(this)">{{ t('nav.refresh') }}</button>
     <div class="langbox themebox">

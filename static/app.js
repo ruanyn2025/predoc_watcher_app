@@ -1,5 +1,36 @@
 'use strict';
 
+async function saveManualJob(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const button = form.querySelector('button[type="submit"]');
+  if (button.disabled) return;
+  button.disabled = true;
+  try {
+    const result = await post('/api/manual/add', Object.fromEntries(new FormData(form)));
+    if (!result.ok) { toast(result.error); return; }
+    location.href = '/history?source=manual#job-' + encodeURIComponent(result.key);
+  } catch (error) {
+    toast(S('manual.failed'));
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function deleteManualJob(button) {
+  if (button.disabled || !confirm(S('manual.confirm_delete', {title: button.dataset.title}))) return;
+  button.disabled = true;
+  try {
+    const result = await post('/api/manual/delete', {key: button.dataset.key});
+    if (!result.ok) { toast(result.error); return; }
+    location.reload();
+  } catch (error) {
+    toast(S('manual.failed'));
+  } finally {
+    button.disabled = false;
+  }
+}
+
 /* 界面文案由服务端按当前语言注入到 window.S（见 i18n.py 的 js_strings）。
    模板里的静态文字已经翻好了，这里只管动态生成的那部分。 */
 function S(key, vars) {

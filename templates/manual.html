@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}{{ t('manual.add') }} · Predoc Watcher{% endblock %}
+{% block body %}
+<section class="panel">
+  <h2>{{ t('manual.add') }}</h2>
+  <p class="dim">{{ t('manual.hint') }}</p>
+  <form id="manualForm" onsubmit="saveManualJob(event)">
+    {% for name, label in [('title', 'manual.title'), ('institution', 'card.institution'), ('researchers', 'card.researchers'), ('fields', 'card.fields'), ('deadline_raw', 'card.deadline'), ('link', 'ann.url')] %}
+    <label class="field"><span>{{ t(label) }}</span>
+      <input name="{{ name }}" type="{{ 'url' if name == 'link' else 'text' }}" maxlength="2000" {% if name == 'title' %}required autofocus{% endif %}>
+    </label>
+    {% endfor %}
+    <div class="modal-actions">
+      <a class="btn ghost" href="/history">{{ t('ann.cancel') }}</a>
+      <button class="btn primary" type="submit">{{ t('ann.save') }}</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

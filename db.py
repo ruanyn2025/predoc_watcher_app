@@ -12,6 +12,8 @@ import json
 import sqlite3
 from datetime import date
 from pathlib import Path
+from uuid import uuid4
+from urllib.parse import urlsplit
 
 BASE_DIR = Path(__file__).resolve().parent
 DB_PATH = BASE_DIR / "jobs.db"
@@ -136,6 +138,7 @@ def is_initialized(conn):
 # ---------------------------------------------------------------- 查询
 
 SOURCE_LABELS = {
+    "manual": "手动添加",
     "predoc": "predoc.org",
     "nber": "NBER（本部）",
     "nber_external": "NBER（非本部）",
@@ -249,6 +252,45 @@ def reminders_between(conn, start, end):
 
 
 # ---------------------------------------------------------------- 写入
+
+def add_manual_job(conn, payload):
+    fields = ("title", "link", "institution", "researchers", "fields", "deadline_raw")
+    values = {}
+    for field in fields:
+        value = payload.get(field, "")
+        if not isinstance(value, str) or len(value) > 2000:
+            raise ValueError("manual.invalid")
+        values[field] = value.strip()
+    if not values["title"]:
+        raise ValueError("manual.need_title")
+    if values["link"]:
+        try:
+            url = urlsplit(values["link"])
+            valid = url.scheme in ("http", "https") and bool(url.hostname)
+        except ValueError:
+            valid = False
+        if not valid:
+            raise ValueError("manual.bad_url")
+    key = "manual-" + uuid4().hex
+    today = date.today().isoformat()
+    with conn:
+        conn.execute(
+            "INSERT INTO jobs(key, source, title, link, institution, researchers, fields, "
+            "deadline_raw, first_seen, last_seen, status, unread) "
+            "VALUES(?, 'manual', ?, ?, ?, ?, ?, ?, ?, ?, 'open', 0)",
+            (key, *(values[f] for f in fields), today, today))
+    return key
+
+
+def delete_manual_job(conn, key):
+    with conn:
+        # Only a manual posting may be permanently removed through this interface.
+        deleted = conn.execute("DELETE FROM jobs WHERE key=? AND source='manual'", (key,))
+        if deleted.rowcount != 1:
+            raise ValueError("manual.not_found")
+        conn.execute("DELETE FROM annotations WHERE key=?", (key,))
+        conn.execute("DELETE FROM stars WHERE key=?", (key,))
+
 
 def star(conn, key, remind_on, basis, note=""):
     conn.execute(

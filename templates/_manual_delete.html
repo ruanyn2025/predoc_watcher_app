@@ -1,0 +1,4 @@
+{% if j.source == 'manual' %}
+<button class="btn tiny danger" data-key="{{ j.key }}" data-title="{{ j.title }}"
+        onclick="deleteManualJob(this)">{{ t('ann.delete') }}</button>
+{% endif %}

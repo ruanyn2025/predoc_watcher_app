@@ -210,6 +210,29 @@ def page_calendar(conn, query):
                   weekdays=i18n.weekdays(lang), month_name=i18n.month_name(month, lang))
 
 
+def page_manual(conn, query):
+    return render("manual.html", conn=conn, lang=current_lang(conn), nav="manual")
+
+
+def api_manual_add(conn, payload):
+    if not isinstance(payload, dict):
+        return {"ok": False, "error": i18n.t("manual.invalid", current_lang(conn))}
+    try:
+        return {"ok": True, "key": db.add_manual_job(conn, payload)}
+    except ValueError as exc:
+        return {"ok": False, "error": i18n.t(str(exc), current_lang(conn))}
+
+
+def api_manual_delete(conn, payload):
+    if not isinstance(payload, dict) or not isinstance(payload.get("key"), str):
+        return {"ok": False, "error": i18n.t("manual.invalid", current_lang(conn))}
+    try:
+        db.delete_manual_job(conn, payload["key"])
+    except ValueError as exc:
+        return {"ok": False, "error": i18n.t(str(exc), current_lang(conn))}
+    return {"ok": True}
+
+
 def api_suggest(conn, payload):
     """收藏面板打开时调用。
 
@@ -329,10 +352,10 @@ def api_refresh(conn, payload):
         return {"ok": False, "error": str(exc)}
 
 
-PAGES = {"/": page_index, "/history": page_history, "/applications": page_applications,
+PAGES = {"/manual": page_manual, "/": page_index, "/history": page_history, "/applications": page_applications,
          "/starred": page_starred, "/calendar": page_calendar}
 APIS = {"/api/lang": api_lang, "/api/theme": api_theme, "/api/cal-color": api_cal_color, "/api/suggest": api_suggest, "/api/star": api_star, "/api/unstar": api_unstar,
-        "/api/done": api_done,
+        "/api/done": api_done, "/api/manual/add": api_manual_add, "/api/manual/delete": api_manual_delete,
         "/api/apply": api_apply, "/api/unapply": api_unapply, "/api/stage": api_stage,
         "/api/annotation/add": api_ann_add, "/api/annotation/update": api_ann_update,
         "/api/annotation/delete": api_ann_delete, "/api/mark-read": api_mark_read, "/api/refresh": api_refresh}

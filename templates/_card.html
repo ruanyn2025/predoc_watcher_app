@@ -2,7 +2,8 @@
 {% macro card(j, show_remind=false, show_apply=false, a=none) %}
 <article class="card {{ 'closed' if j.status=='closed' }}" id="job-{{ j.key }}">
   <div class="card-head">
-    <h3><a href="{{ j.link }}" target="_blank" rel="noopener">{{ j.title or t('card.untitled') }}</a></h3>
+    <h3>{% if j.link %}<a href="{{ j.link }}" target="_blank" rel="noopener">{{ j.title or t('card.untitled') }}</a>{% else %}{{ j.title or t('card.untitled') }}{% endif %}</h3>
+    {% include '_manual_delete.html' %}
     {% if j.starred and show_apply %}
     <button class="btn tiny apply" data-key="{{ j.key }}"
             onclick="markApplied(this)" title="{{ t('apps.mark_hint') }}">
@@ -27,7 +28,7 @@
 
   <div class="badges">
     <span class="badge src-{{ j.source }}">{{ source_label(j.source) }}</span>
-    <span class="badge date" title="{{ t('card.seen_hint') }}">{{ t('card.seen', date=j.first_seen) }}</span>
+    <span class="badge date">{{ t('manual.created' if j.source == 'manual' else 'card.seen', date=j.first_seen) }}</span>
     {% if j.status=='closed' %}<span class="badge gone">{{ t('card.closed') }}</span>{% endif %}
     {% if show_remind and j.remind_on %}
       {% set dleft = j.remind_on|days_until %}

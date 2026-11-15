@@ -300,7 +300,7 @@ def js_strings(lang):
     """前端要用到的那部分，注入页面供 app.js 取用。"""
     i = _idx(lang)
     return {k: v[i] for k, v in S.items()
-            if k.startswith(("modal.", "toast.", "ann.", "card.", "cal."))}
+            if k.startswith(("modal.", "toast.", "ann.", "card.", "cal.", "manual."))}
 
 
 def lang_options(current):
@@ -421,6 +421,20 @@ S.update({
 })
 
 THEMES = ("system", "light", "dark")
+
+S.update({
+    "src.manual": ("手动添加", "手動新增", "Manual", "Manuelle", "Manual"),
+    "manual.add": ("添加岗位", "新增職缺", "Add posting", "Ajouter une offre", "Añadir oferta"),
+    "manual.title": ("岗位标题（必填）", "職缺標題（必填）", "Title (required)", "Titre (obligatoire)", "Título (obligatorio)"),
+    "manual.hint": ("标题必填，其余选填。添加后可在历史列表中收藏并设置提醒。", "標題必填，其餘選填。新增後可在歷史列表中收藏並設定提醒。", "Only a title is required. Save the posting, then star it in History to set a reminder.", "Seul le titre est obligatoire. Retrouvez l’offre dans l’historique pour l’ajouter aux favoris et définir un rappel.", "Solo el título es obligatorio. Guarda la oferta y añádela a Favoritos desde Historial para crear un recordatorio."),
+    "manual.created": ("添加于 {date}", "新增於 {date}", "Added {date}", "Ajoutée le {date}", "Añadida el {date}"),
+    "manual.need_title": ("请填写岗位标题", "請填寫職缺標題", "Enter a title", "Saisissez un titre", "Introduce un título"),
+    "manual.invalid": ("请检查填写内容，每项最多 2000 字", "請檢查填寫內容，每項最多 2000 字", "Check the fields; each allows up to 2000 characters", "Vérifiez les champs : 2000 caractères maximum chacun", "Revisa los campos: máximo 2000 caracteres por campo"),
+    "manual.bad_url": ("链接须为有效的 http 或 https 地址", "連結須為有效的 http 或 https 網址", "Enter a valid http or https URL", "Saisissez une URL http ou https valide", "Introduce una URL http o https válida"),
+    "manual.not_found": ("手动岗位不存在，或该岗位来自抓取", "手動職缺不存在，或該職缺來自擷取", "Manual posting not found, or this posting was fetched", "Offre manuelle introuvable, ou cette offre a été collectée", "Oferta manual no encontrada, o esta oferta fue recopilada"),
+    "manual.confirm_delete": ("删除“{title}”？该岗位的收藏、申请记录和标注也会删除，无法撤销。", "刪除「{title}」？該職缺的收藏、申請記錄和標註也會刪除，無法復原。", "Delete “{title}”? Its star, application record and annotations will also be permanently deleted.", "Supprimer « {title} » ? Ses favoris, sa candidature et ses annotations seront aussi supprimés définitivement.", "¿Eliminar «{title}»? Sus favoritos, candidatura y anotaciones también se eliminarán permanentemente."),
+    "manual.failed": ("操作失败，请重试", "操作失敗，請重試", "Operation failed. Please retry.", "Échec de l’opération. Réessayez.", "La operación falló. Inténtalo de nuevo."),
+})
 
 
 def normalise_theme(theme):

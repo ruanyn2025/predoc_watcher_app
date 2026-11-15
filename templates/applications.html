@@ -17,7 +17,8 @@
     {% set a = ann.get(j.key, {}) %}
     <article class="card app" data-key="{{ j.key }}" id="job-{{ j.key }}">
       <div class="card-head">
-        <h3><a href="{{ j.link }}" target="_blank" rel="noopener">{{ j.title or t('card.untitled') }}</a></h3>
+        <h3>{% if j.link %}<a href="{{ j.link }}" target="_blank" rel="noopener">{{ j.title or t('card.untitled') }}</a>{% else %}{{ j.title or t('card.untitled') }}{% endif %}</h3>
+        {% include '_manual_delete.html' %}
         <select class="stage-pick" onchange="setStage(this)" data-key="{{ j.key }}">
           {% for st in stages %}
           <option value="{{ st }}" {{ 'selected' if st == j.stage }}>{{ t('stage.' ~ st) }}</option>
@@ -31,7 +32,7 @@
         <span class="badge src-{{ j.source }}">{{ source_label(j.source) }}</span>
         {# 抓取日期在这页同样要有：投递之后回头看，「这条挂了多久我才投的」
            和「投出去多久了」是两个不同的问题，都需要。 #}
-        <span class="badge date" title="{{ t('card.seen_hint') }}">{{ t('card.seen', date=j.first_seen) }}</span>
+        <span class="badge date">{{ t('manual.created' if j.source == 'manual' else 'card.seen', date=j.first_seen) }}</span>
         <span class="badge date">{{ t('apps.applied_on', date=fdate(j.applied_at)) }}</span>
         {% set d = j.applied_at|days_since %}
         {% if d is not none %}
