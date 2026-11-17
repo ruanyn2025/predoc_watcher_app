@@ -119,10 +119,10 @@ postings without a reminder, then overdue reminders. Each group is sorted by rem
 overdue postings stay starred. The **Edit**
 button on each card changes the reminder date and the note. Pressing a lit star unstars.
 
-**Applications** — pressing "Applied" on a starred posting moves it here. For each one you can:
+**Progress** — pressing "Applied" on a starred posting moves it here. For each one you can:
 
 - Set the **status**: Applied / Archived. Choosing Archived moves the
-  application to its own page alongside Starred and Applications.
+  application to its own page alongside Starred and Progress.
 - Record **several named dates**, such as "code test due 9/18" or "first interview 9/25 10:00".
 - Add **notes** and **links**. Links can be given your own label and open in your browser.
 - See the date you applied and how long ago that was.
@@ -132,10 +132,10 @@ yet. Moving an application back to Starred keeps everything you wrote.
 
 **Calendar** — a month view of three kinds of mark: reminders on starred postings, the dates you recorded on an application, and the day you applied. Dates within 7 days are shown
 solid, later ones tinted. Hovering a mark shows the institution and researchers; clicking it jumps
-back to the card on Starred or Applications.
+back to the card on Starred or Progress.
 
 **Archived** — only submitted applications can be archived, keeping all annotations and application dates.
-Choose Applied to restore one to Applications. Related calendar entries link to its archived card.
+Choose Applied to restore one to Progress. Related calendar entries link to its archived card.
 Applications previously marked Closed also appear here.
 
 ## Add your own postings
@@ -230,6 +230,7 @@ python_path.txt       your interpreter path (optional)
 
 ### 2026-11-16
 
+- Renamed the English Applications tab to Progress.
 - Keep only Applied and Archived; previous Test and Interview records become Applied with annotations preserved.
 
 ### 2026-11-15

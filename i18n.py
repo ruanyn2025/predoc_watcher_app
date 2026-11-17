@@ -316,8 +316,8 @@ if _bad:
 
 S.update({
     # ---- 申请追踪 ------------------------------------------------------
-    "nav.apps":       ("申请追踪", "申請追蹤", "Applications", "Candidatures", "Candidaturas"),
-    "apps.title":     ("申请追踪", "申請追蹤", "Applications", "Candidatures", "Candidaturas"),
+    "nav.apps":       ("申请追踪", "申請追蹤", "Progress", "Candidatures", "Candidaturas"),
+    "apps.title":     ("申请追踪", "申請追蹤", "Progress", "Candidatures", "Candidaturas"),
     "apps.sub":       ("按投递时间倒序", "按投遞時間倒序", "newest first",
                        "les plus récentes d'abord", "las más recientes primero"),
     "apps.empty":     ("还没有投递记录。在收藏夹里点「完成投递」，岗位就会搬到这里。",
@@ -327,7 +327,7 @@ S.update({
                        "Sin candidaturas. Pulsa «Enviada» en una oferta guardada para moverla aquí."),
     "apps.mark":      ("完成投递", "完成投遞", "Applied", "Envoyée", "Enviada"),
     "apps.mark_hint": ("标记为已投递，移到申请追踪页", "標記為已投遞，移到申請追蹤頁",
-                       "Mark as applied and move to Applications",
+                       "Mark as applied and move to Progress",
                        "Marquer comme envoyée et déplacer vers Candidatures",
                        "Marcar como enviada y mover a Candidaturas"),
     "apps.undo":      ("撤回投递", "撤回投遞", "Not applied", "Pas envoyée", "No enviada"),
@@ -387,7 +387,7 @@ S.update({
     "ann.need_url":   ("先填链接地址", "先填連結地址", "Enter a URL first",
                        "Saisissez une URL", "Introduce una URL"),
 
-    "toast.applied":  ("已移入申请追踪", "已移入申請追蹤", "Moved to Applications",
+    "toast.applied":  ("已移入申请追踪", "已移入申請追蹤", "Moved to Progress",
                        "Déplacée vers Candidatures", "Movida a Candidaturas"),
     "toast.unapplied": ("已退回收藏夹", "已退回收藏夾", "Moved back to Starred",
                         "Remise dans les favoris", "Devuelta a Favoritos"),
