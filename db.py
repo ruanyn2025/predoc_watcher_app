@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS stars (
     note         TEXT,
     done         INTEGER NOT NULL DEFAULT 0,
     applied_at   TEXT,            -- 点「完成投递」的日期；非空即进入申请追踪页
-    stage        TEXT             -- applied | test | interview | closed
+    stage        TEXT             -- applied | closed (archived)
 );
 CREATE INDEX IF NOT EXISTS idx_stars_remind  ON stars(remind_on);
 
@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS meta (k TEXT PRIMARY KEY, v TEXT);
 """
 
 # closed 申请单独显示在归档页。
-STAGES = ("applied", "test", "interview", "closed")
+STAGES = ("applied", "closed")
 
 
 def connect():
@@ -95,6 +95,7 @@ def init(conn):
         conn.execute("ALTER TABLE stars ADD COLUMN applied_at TEXT")
     if "stage" not in scols:
         conn.execute("ALTER TABLE stars ADD COLUMN stage TEXT")
+    conn.execute("UPDATE stars SET stage='applied' WHERE stage IN ('test', 'interview')")
     # 这条索引必须等上面的 ALTER 跑完 —— 老库里 applied_at 那时才存在
     conn.execute("CREATE INDEX IF NOT EXISTS idx_stars_applied ON stars(applied_at)")
     _migrate_notes(conn)
@@ -357,7 +358,7 @@ def set_stage(conn, key, stage):
 def applications(conn, archived=False):
     return _rows(conn.execute(
         "SELECT j.*, 1 AS starred, s.remind_on, s.note, s.applied_at, "
-        "       COALESCE(NULLIF(s.stage, ''), 'applied') AS stage "
+        "       CASE WHEN s.stage='closed' THEN 'closed' ELSE 'applied' END AS stage "
         "FROM stars s JOIN jobs j ON j.key = s.key "
         "WHERE s.applied_at IS NOT NULL "
         "AND (COALESCE(NULLIF(s.stage, ''), 'applied') = 'closed') = ? "

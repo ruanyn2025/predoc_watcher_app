@@ -341,11 +341,8 @@ S.update({
                         "il y a {n} jour|il y a {n} jours", "hace {n} día|hace {n} días"),
     "apps.today":     ("今天", "今天", "today", "aujourd'hui", "hoy"),
 
-    # 四个阶段
+    # 两种申请状态
     "stage.applied":  ("已投递", "已投遞", "Applied", "Envoyée", "Enviada"),
-    "stage.test":     ("笔试 · code test", "筆試 · code test", "Test",
-                       "Test technique", "Prueba técnica"),
-    "stage.interview": ("面试", "面試", "Interview", "Entretien", "Entrevista"),
     "stage.closed":   ("已归档", "已歸檔", "Archived", "Archivée", "Archivada"),
 
     # 三类标注
@@ -426,7 +423,7 @@ S.update({
     "archived.title": ("已归档", "已歸檔", "Archived", "Archives", "Archivadas"),
     "archived.empty": ("还没有归档的申请。", "還沒有歸檔的申請。", "No archived applications yet.", "Aucune candidature archivée.", "No hay candidaturas archivadas."),
     "archived.move_hint": ("选择「已归档」，申请会移入已归档页面。", "選擇「已歸檔」，申請會移入已歸檔頁面。", "Choose Archived to move an application to the Archived page.", "Choisissez Archivée pour déplacer une candidature vers les archives.", "Selecciona Archivada para mover una candidatura al archivo."),
-    "archived.restore_hint": ("切换回其他阶段即可恢复到申请追踪，标注会保留。", "切換回其他階段即可恢復到申請追蹤，標註會保留。", "Choose another stage to restore an application. Annotations are kept.", "Choisissez un autre statut pour restaurer la candidature. Les annotations sont conservées.", "Elige otra etapa para restaurar la candidatura. Se conservan las anotaciones."),
+    "archived.restore_hint": ("选择「已投递」即可恢复到申请追踪，标注会保留。", "選擇「已投遞」即可恢復到申請追蹤，標註會保留。", "Choose Applied to restore an application. Annotations are kept.", "Choisissez Envoyée pour restaurer la candidature. Les annotations sont conservées.", "Elige Enviada para restaurar la candidatura. Se conservan las anotaciones."),
 })
 
 S.update({

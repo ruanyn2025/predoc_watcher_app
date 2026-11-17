@@ -32,7 +32,7 @@ class ArchivedTest(unittest.TestCase):
         self.assertEqual(db.stats(self.conn)['applications'], 0)
         self.assertEqual(db.stats(self.conn)['archived'], 1)
         self.assertEqual(db.starred_jobs(self.conn), [])
-        db.set_stage(self.conn, self.key, 'interview')
+        db.set_stage(self.conn, self.key, 'applied')
         self.assertEqual(db.applications(self.conn, archived=True), [])
         self.assertEqual(db.applications(self.conn)[0]['applied_at'], original['applied_at'])
         self.assertEqual(db.annotations_for(self.conn, [self.key]), annotations)
@@ -57,10 +57,26 @@ class ArchivedTest(unittest.TestCase):
         self.assertIn('/starred#job-' + self.key, app.page_calendar(self.conn, {}).decode())
 
     def test_missing_stage_stays_active(self):
-        for stage in (None, ''):
+        for stage in (None, '', 'test', 'interview'):
             self.conn.execute('UPDATE stars SET stage=? WHERE key=?', (stage, self.key))
             self.assertEqual(len(db.applications(self.conn)), 1)
+            self.assertEqual(db.applications(self.conn)[0]['stage'], 'applied')
             self.assertEqual(db.applications(self.conn, archived=True), [])
+
+    def test_legacy_stage_migration_and_options(self):
+        annotations = db.annotations_for(self.conn, [self.key])
+        for stage in ('test', 'interview'):
+            self.conn.execute('UPDATE stars SET stage=? WHERE key=?', (stage, self.key))
+            db.init(self.conn)
+            db.init(self.conn)
+            self.assertEqual(self.conn.execute('SELECT stage FROM stars WHERE key=?', (self.key,)).fetchone()[0], 'applied')
+            self.assertEqual(db.annotations_for(self.conn, [self.key]), annotations)
+            self.assertFalse(app.api_stage(self.conn, {'key': self.key, 'stage': stage})['ok'])
+        html = app.page_applications(self.conn, {}).decode()
+        self.assertIn('value="applied"', html)
+        self.assertIn('value="closed"', html)
+        self.assertNotIn('value="test"', html)
+        self.assertNotIn('value="interview"', html)
 
 
 if __name__ == '__main__':
