@@ -121,8 +121,8 @@ button on each card changes the reminder date and the note. Pressing a lit star 
 
 **Applications** — pressing "Applied" on a starred posting moves it here. For each one you can:
 
-- Set the **stage**: Applied / Test / Interview / Closed. The page groups by stage;
-  Closed applications move to Archived.
+- Set the **stage**: Applied / Test / Interview / Archived. Choosing Archived moves the
+  application to its own page alongside Starred and Applications.
 - Record **several named dates**, such as "code test due 9/18" or "first interview 9/25 10:00".
 - Add **notes** and **links**. Links can be given your own label and open in your browser.
 - See the date you applied and how long ago that was.
@@ -134,8 +134,9 @@ yet. Moving an application back to Starred keeps everything you wrote.
 solid, later ones tinted. Hovering a mark shows the institution and researchers; clicking it jumps
 back to the card on Starred or Applications.
 
-**Archived** — applications with the Closed stage, keeping all annotations and application dates.
+**Archived** — only submitted applications can be archived, keeping all annotations and application dates.
 Choose another stage to restore one to Applications. Related calendar entries link to its archived card.
+Applications previously marked Closed also appear here.
 
 ## Add your own postings
 
@@ -229,7 +230,7 @@ python_path.txt       your interpreter path (optional)
 
 ### 2026-11-16
 
-- Closed applications now appear in Archived; change their stage to restore them.
+- Submitted applications can be moved to Archived; change their stage to restore them.
 
 ### 2026-11-15
 

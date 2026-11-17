@@ -346,7 +346,7 @@ S.update({
     "stage.test":     ("笔试 · code test", "筆試 · code test", "Test",
                        "Test technique", "Prueba técnica"),
     "stage.interview": ("面试", "面試", "Interview", "Entretien", "Entrevista"),
-    "stage.closed":   ("结束", "結束", "Closed", "Terminée", "Cerrada"),
+    "stage.closed":   ("已归档", "已歸檔", "Archived", "Archivée", "Archivada"),
 
     # 三类标注
     "ann.event":      ("时间", "時間", "Dates", "Échéances", "Fechas"),
@@ -425,7 +425,7 @@ THEMES = ("system", "light", "dark")
 S.update({
     "archived.title": ("已归档", "已歸檔", "Archived", "Archives", "Archivadas"),
     "archived.empty": ("还没有归档的申请。", "還沒有歸檔的申請。", "No archived applications yet.", "Aucune candidature archivée.", "No hay candidaturas archivadas."),
-    "archived.move_hint": ("将阶段设为「结束」，申请会移入已归档。", "將階段設為「結束」，申請會移入已歸檔。", "Set the stage to Closed to move an application to Archived.", "Choisissez le statut Terminée pour archiver une candidature.", "Selecciona la etapa Cerrada para archivar una candidatura."),
+    "archived.move_hint": ("选择「已归档」，申请会移入已归档页面。", "選擇「已歸檔」，申請會移入已歸檔頁面。", "Choose Archived to move an application to the Archived page.", "Choisissez Archivée pour déplacer une candidature vers les archives.", "Selecciona Archivada para mover una candidatura al archivo."),
     "archived.restore_hint": ("切换回其他阶段即可恢复到申请追踪，标注会保留。", "切換回其他階段即可恢復到申請追蹤，標註會保留。", "Choose another stage to restore an application. Annotations are kept.", "Choisissez un autre statut pour restaurer la candidature. Les annotations sont conservées.", "Elige otra etapa para restaurar la candidatura. Se conservan las anotaciones."),
 })
 
