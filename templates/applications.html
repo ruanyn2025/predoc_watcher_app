@@ -1,18 +1,19 @@
 {% extends "base.html" %}
 {% from "_anns.html" import anns with context %}
-{% block title %}{{ t('apps.title') }} · Predoc Watcher{% endblock %}
+{% block title %}{{ t('archived.title' if archived else 'apps.title') }} · Predoc Watcher{% endblock %}
 {% block body %}
 
 <section class="panel">
-  <h2>{{ t('apps.title') }} <span class="dim">{{ t('apps.sub') }}</span></h2>
+  <h2>{{ t('archived.title' if archived else 'apps.title') }} <span class="dim">{{ t('apps.sub') }}</span></h2>
+  <p class="dim">{{ t('archived.restore_hint' if archived else 'archived.move_hint') }}</p>
 
   {% if not groups %}
-    <p class="empty">{{ t('apps.empty') }}</p>
+    <p class="empty">{{ t('archived.empty' if archived else 'apps.empty') }}</p>
   {% endif %}
 
   {% for g in groups %}
   <h4 class="daysep">{{ t('stage.' ~ g.stage) }} <span class="dim">{{ g.jobs|length }}</span></h4>
-  <div class="cards{{ ' closed-group' if g.stage == 'closed' }}">
+  <div class="cards">
     {% for j in g.jobs %}
     {% set a = ann.get(j.key, {}) %}
     <article class="card app" data-key="{{ j.key }}" id="job-{{ j.key }}">

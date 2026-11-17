@@ -104,7 +104,7 @@ python app.py
 
 That path does not need pywebview or pystray installed.
 
-## The five pages
+## The six pages
 
 **New** — postings that appeared since you last hit "Mark all read", grouped by the date they were
 found. Reminders due in the next 7 days sit at the top, turning red inside 3 days.
@@ -121,8 +121,8 @@ button on each card changes the reminder date and the note. Pressing a lit star 
 
 **Applications** — pressing "Applied" on a starred posting moves it here. For each one you can:
 
-- Set the **stage**: Applied / Test / Interview / Closed. The page groups by stage and folds
-  Closed ones to the bottom.
+- Set the **stage**: Applied / Test / Interview / Closed. The page groups by stage;
+  Closed applications move to Archived.
 - Record **several named dates**, such as "code test due 9/18" or "first interview 9/25 10:00".
 - Add **notes** and **links**. Links can be given your own label and open in your browser.
 - See the date you applied and how long ago that was.
@@ -133,6 +133,9 @@ yet. Moving an application back to Starred keeps everything you wrote.
 **Calendar** — a month view of three kinds of mark: reminders on starred postings, the dates you recorded on an application, and the day you applied. Dates within 7 days are shown
 solid, later ones tinted. Hovering a mark shows the institution and researchers; clicking it jumps
 back to the card on Starred or Applications.
+
+**Archived** — applications with the Closed stage, keeping all annotations and application dates.
+Choose another stage to restore one to Applications. Related calendar entries link to its archived card.
 
 ## Add your own postings
 
@@ -223,6 +226,10 @@ python_path.txt       your interpreter path (optional)
 - The window and tray have only been tested on Windows.
 
 ## Changelog
+
+### 2026-11-16
+
+- Closed applications now appear in Archived; change their stage to restore them.
 
 ### 2026-11-15
 

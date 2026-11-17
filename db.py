@@ -73,7 +73,7 @@ CREATE INDEX IF NOT EXISTS idx_ann_date ON annotations(on_date);
 CREATE TABLE IF NOT EXISTS meta (k TEXT PRIMARY KEY, v TEXT);
 """
 
-# 申请阶段。closed 折到页面底部，正好接管那个从来没被用起来的 done 字段。
+# closed 申请单独显示在归档页。
 STAGES = ("applied", "test", "interview", "closed")
 
 
@@ -323,7 +323,8 @@ def stats(conn):
         "SELECT source, COUNT(*) n FROM jobs WHERE status='open' GROUP BY source")}
     return {"total": row["n"] or 0, "open": row["opened"] or 0,
             "closed": row["closed"] or 0, "starred": starred,
-            "per_source": per_source, "applications": count_applications(conn)}
+            "per_source": per_source, "applications": count_applications(conn),
+            "archived": count_applications(conn, exclude_closed=False) - count_applications(conn)}
 
 
 # ------------------------------------------------------- 申请追踪
@@ -353,13 +354,14 @@ def set_stage(conn, key, stage):
     conn.commit()
 
 
-def applications(conn):
+def applications(conn, archived=False):
     return _rows(conn.execute(
         "SELECT j.*, 1 AS starred, s.remind_on, s.note, s.applied_at, "
         "       COALESCE(NULLIF(s.stage, ''), 'applied') AS stage "
         "FROM stars s JOIN jobs j ON j.key = s.key "
         "WHERE s.applied_at IS NOT NULL "
-        "ORDER BY s.applied_at DESC, j.title"))
+        "AND (COALESCE(NULLIF(s.stage, ''), 'applied') = 'closed') = ? "
+        "ORDER BY s.applied_at DESC, j.title", (int(archived),)))
 
 
 def count_applications(conn, exclude_closed=True):
@@ -432,7 +434,7 @@ def annotation_events_between(conn, start, end):
     """日历用：申请事件，带上所属岗位的标题。"""
     return _rows(conn.execute(
         "SELECT a.*, j.title, j.link, j.source, j.institution, j.researchers, "
-        "       st.applied_at "
+        "       st.applied_at, st.stage "
         "FROM annotations a JOIN jobs j ON j.key = a.key "
         "LEFT JOIN stars st ON st.key = a.key "
         "WHERE a.kind = 'event' AND a.on_date BETWEEN ? AND ? "

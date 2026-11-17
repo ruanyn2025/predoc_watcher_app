@@ -130,9 +130,9 @@ def page_starred(conn, query):
                   nav="starred", lang=lang)
 
 
-def page_applications(conn, query):
+def page_applications(conn, query, archived=False):
     lang = current_lang(conn)
-    apps = db.applications(conn)
+    apps = db.applications(conn, archived=archived)
     ann = db.annotations_for(conn, [a["key"] for a in apps])
     groups = []
     for stage in db.STAGES:
@@ -140,7 +140,12 @@ def page_applications(conn, query):
         if rows:
             groups.append({"stage": stage, "jobs": rows})
     return render("applications.html", conn=conn, groups=groups, ann=ann,
-                  total=len(apps), stages=db.STAGES, nav="apps", lang=lang)
+                  total=len(apps), stages=db.STAGES, nav="archived" if archived else "apps",
+                  archived=archived, lang=lang)
+
+
+def page_archived(conn, query):
+    return page_applications(conn, query, archived=True)
 
 
 def page_calendar(conn, query):
@@ -175,7 +180,7 @@ def page_calendar(conn, query):
             "done": j["done"]})
     for e in db.annotation_events_between(conn, first.isoformat(), last.isoformat()):
         # 事件也可能挂在还没投递的收藏上，那就跳回收藏夹
-        page = "/applications" if e["applied_at"] else "/starred"
+        page = ("/archived" if e["stage"] == "closed" else "/applications") if e["applied_at"] else "/starred"
         by_day.setdefault(e["on_date"], []).append({
             "kind": "event", "label": e["label"], "job": e["title"],
             "institution": e["institution"] or "", "researchers": e["researchers"] or "",
@@ -188,7 +193,8 @@ def page_calendar(conn, query):
         by_day.setdefault(a["applied_at"], []).append({
             "kind": "applied", "label": a["title"], "job": a["title"],
             "institution": a["institution"] or "", "researchers": a["researchers"] or "",
-            "href": "/applications#job-" + a["key"], "near": False, "done": False})
+            "href": ("/archived" if a["stage"] == "closed" else "/applications") + "#job-" + a["key"],
+            "near": False, "done": False})
 
     start = first - timedelta(days=first.weekday())
     weeks, cur = [], start
@@ -352,7 +358,7 @@ def api_refresh(conn, payload):
         return {"ok": False, "error": str(exc)}
 
 
-PAGES = {"/manual": page_manual, "/": page_index, "/history": page_history, "/applications": page_applications,
+PAGES = {"/archived": page_archived, "/manual": page_manual, "/": page_index, "/history": page_history, "/applications": page_applications,
          "/starred": page_starred, "/calendar": page_calendar}
 APIS = {"/api/lang": api_lang, "/api/theme": api_theme, "/api/cal-color": api_cal_color, "/api/suggest": api_suggest, "/api/star": api_star, "/api/unstar": api_unstar,
         "/api/done": api_done, "/api/manual/add": api_manual_add, "/api/manual/delete": api_manual_delete,
